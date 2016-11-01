@@ -3,14 +3,14 @@ import structures.dict.LinkedDict;
 
 public class Table<PrimaryKey> {
   private Dict<PrimaryKey, Dict<String, Object>> table;
-  private Dict<String, Object> columns;
+  private Dict<String, Class<?>> columns;
 
   public Table() {
     table = new LinkedDict<PrimaryKey, Dict<String, Object>>();
-    columns = new LinkedDict<String, Object>();
+    columns = new LinkedDict<String, Class<?>>();
   }
 
-  public Table<PrimaryKey> addColumn(String name, Object type) {
+  public Table<PrimaryKey> addColumn(String name, Class<?> type) {
     columns.add(name, type);
     return this;
   }
@@ -32,6 +32,10 @@ public class Table<PrimaryKey> {
     checkColumn(column);
     Dict<String, Object> row = getRow(key);
     return row.getValue(column);
+  }
+
+  public Class<?> getTypeofColumn(String columnName) {
+    return columns.getValue(columnName);
   }
 
   public Table<PrimaryKey> addCell(PrimaryKey key, String column, Object value) {

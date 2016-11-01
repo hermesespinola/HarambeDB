@@ -2,6 +2,7 @@ package structures.dict;
 
 import java.util.Iterator;
 import java.io.Serializable;
+import java.util.List;
 
 public interface Dict<K,V> extends Serializable  {
   public void add(K key, V value);

@@ -186,7 +186,7 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
   }
 
   public V get(K key) {
-    return root.get(key);
+    return (root != null) ? root.get(key) : null;
   }
 
   public KeyValueNode<K,V> getClosest(K key) {

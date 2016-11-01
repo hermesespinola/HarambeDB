@@ -7,6 +7,7 @@ import java.util.Stack;
 */
 public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
   private static final long serialVersionUID = 11L;
+  protected int size;
   private static class AVLNode<K extends Comparable<? super K>, V> extends BSTNode<K, V> {
     protected int height;
     private static final long serialVersionUID = 15L;
@@ -93,11 +94,16 @@ public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
   @Override
   public void add(K key, V val) {
     this.root = add(key, val, (AVLNode<K,V>)root);
+    this.size++;
   }
 
   @Override
   public V remove(K key) {
-    return root().remove(key);
+    V ret = root().remove(key);
+    if (ret != null) {
+      this.size--;
+    }
+    return ret;
   }
 
   /*

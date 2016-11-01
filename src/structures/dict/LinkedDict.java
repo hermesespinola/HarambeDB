@@ -1,6 +1,6 @@
 package structures.dict;
 import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.ArrayList; // TODO: change to structures.list.ArrayLinearList.
 import java.util.Iterator;
 import java.io.Serializable;
 

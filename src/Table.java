@@ -2,6 +2,7 @@ import structures.dict.Dict;
 import structures.dict.LinkedDict;
 import structures.tree.AVL;
 import structures.node.KeyValueNode;
+import java.util.ArrayList;
 import java.io.File;
 import java.io.Serializable;
 import java.io.ObjectOutputStream;
@@ -9,12 +10,11 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
+import java.util.Collections;
 
 public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
   // avl tree containing the location and first value of the diferent segments of the table
   private AVL<PrimaryKey, String> tableSegments;
-  // The path to the segment file
-  private String currentSegmentPath;
   // name of the table
   private String tableName;
   // number of segments
@@ -25,9 +25,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private transient Dict<PrimaryKey, Dict<String, Object>> table;
   // maximum number of entries before segmenting the table
   private transient static final int THRESHOLD = 5;
-  private PrimaryKey currentSegmentLesserKey;
+  private transient String currentSegmentPath;
+  private transient PrimaryKey currentSegmentLesserKey;
   private static final long serialVersionUID = 05L;
-  public static final String extension = ".htab";
+  public transient static final String extension = ".hbtb";
 
   public Table(String tableName) {
     table = new LinkedDict<PrimaryKey, Dict<String, Object>>();
@@ -41,12 +42,28 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       } catch (SecurityException se) {
         se.printStackTrace();
       }
+    } else {
+      // TODO: hacer más cosas
+      System.out.println("Table already exists");
     }
   }
 
   public Table<PrimaryKey> addColumn(String name, Class<?> type) {
     columns.add(name, type);
     return this;
+  }
+
+  // cut lesser values of current table and paste it in the next table with lesserKey (left child)
+  //
+  private final void rebalanceSegments() {
+    // FIXME: only works if table is LinkedDict.
+    ArrayList<PrimaryKey> tableKeys = (ArrayList<PrimaryKey>) table.keys();
+    Collections.sort(tableKeys);
+    System.out.println(tableKeys);
+    // cases:
+    // 1. no left node
+    // 2. left node not enough space : rebalance left node table
+
   }
 
   public Table<PrimaryKey> addRow(PrimaryKey key) {
@@ -56,8 +73,14 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       // segment where data should go
       KeyValueNode<PrimaryKey,String> segmentNode = tableSegments.getClosest(key);
       if (segmentNode.getKey().compareTo(currentSegmentLesserKey) != 0) {
-        loadSegment(segmentNode.getValue(), segmentNode.getKey());
+        loadSegment(segmentNode.getValue(), segmentNode.getKey()); // TODO: guardar el otro
       }
+
+      if (table.getSize() == THRESHOLD) {
+        // rebalance the table segments
+        rebalanceSegments();
+      }
+
       table.add(key, new LinkedDict<String, Object>());
     }
 
@@ -139,6 +162,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     if (currentSegmentPath != path) {
       try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
       new FileInputStream(path)))) {
+        saveCurrentSegment();
         currentSegmentPath = path;
         currentSegmentLesserKey = lesserKey;
         return (Dict<PrimaryKey, Dict<String, Object>>) ois.readObject();
@@ -152,6 +176,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private final void save() {
     try (ObjectOutputStream oos = new ObjectOutputStream(
       new FileOutputStream("../" + tableName + '/' + tableName + extension))) {
+      saveCurrentSegment();
       oos.writeObject(this);
     } catch (Exception e) {
       e.printStackTrace();
@@ -175,6 +200,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     userTable.addCell("Isaac", "Address", "Por algún lugar por ahí");
     userTable.addCell("Bernie", "Address", "Asoinfwoiniwefnoin oiasdn oai");
     userTable.addCell("Andres", "Address", "que chingue su madre el pri");
+    userTable.save();
     System.out.println(userTable.getCell("Isaac", "Address"));
   }
 }

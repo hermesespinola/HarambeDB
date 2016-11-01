@@ -189,6 +189,25 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
       this.value = v;
       this.next = nextDictNode;
     }
+
+    public String toString() {
+      return this.key + ": " + this.value;
+    }
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{ ");
+    for (DictNode<Key, Val> root : table) {
+      DictNode<Key,Val> currentNode = root;
+      while (currentNode != null) {
+        sb.append(currentNode).append(", ");
+        currentNode = currentNode.next;
+      }
+    }
+    sb.setLength(sb.length() > 2 ? sb.length()-2 : sb.length());
+    sb.append(" }");
+    return sb.toString();
   }
 
   public static void main(String[] args) {
@@ -204,6 +223,8 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     dict.add("Pez", "Poisson");
     dict.add("Wololo", "AOfE");
     dict.add("qwerty", "asdfg");
+
+    System.out.println(dict);
 
     System.out.println();
     for (String k : dict.keys()) {

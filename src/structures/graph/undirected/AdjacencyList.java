@@ -1,6 +1,9 @@
-import list.ArrayLinearList;
-import list.LinkedList;
-import list.List;
+package structures.graph.undirected;
+
+import structures.list.ArrayLinearList;
+import structures.list.LinkedList;
+import structures.list.List;
+import structures.graph.Graph;
 
 @SuppressWarnings("rawtypes")
 public class AdjacencyList implements Graph {

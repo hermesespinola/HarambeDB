@@ -1,4 +1,6 @@
-import list.List;
+package structures.graph;
+
+import structures.list.List;
 
 public interface Graph {
   public void addEdge(int i, int j);

@@ -1,4 +1,4 @@
-package tree;
+package structures.tree;
 
 import java.util.Stack;
 import java.util.LinkedList;
@@ -6,9 +6,7 @@ import java.util.Queue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
-import node.BinaryTreeNode;
-import tree.Tree;
-import tree.TreeIterator;
+import structures.node.BinaryTreeNode;
 
 @SuppressWarnings("rawtypes")
 public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {

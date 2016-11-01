@@ -1,6 +1,6 @@
-package node;
+package structures.node;
 
-abstract class Node<T> {
+public class Node<T> {
   T value;
 
   public Node(T value) {

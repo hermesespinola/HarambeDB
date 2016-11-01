@@ -1,6 +1,9 @@
-import matrix.TriangularMatrix;
-import list.List;
-import list.ArrayLinearList;
+package structures.graph.undirected;
+
+import structures.matrix.TriangularMatrix;
+import structures.list.List;
+import structures.list.ArrayLinearList;
+import structures.graph.Graph;
 
 public class AdjacencyMatrix implements Graph {
   TriangularMatrix<Boolean> matrix;

@@ -1,7 +1,7 @@
-package tree;
+package  structures.tree;
 
 import java.util.Stack;
-import node.BinaryTreeNode;
+import structures.node.BinaryTreeNode;
 import java.util.Iterator;
 
 public class TreeIterator<K, V> implements Iterator<V> {

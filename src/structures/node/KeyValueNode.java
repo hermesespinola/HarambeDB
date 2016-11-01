@@ -1,4 +1,4 @@
-package node;
+package structures.node;
 
 public class KeyValueNode<K, V> extends Node<V> {
   protected K key;

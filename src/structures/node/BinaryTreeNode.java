@@ -1,4 +1,4 @@
-package node;
+package structures.node;
 
 public class BinaryTreeNode<K, V> extends KeyValueNode<K, V> {
   BinaryTreeNode<K, V> left;

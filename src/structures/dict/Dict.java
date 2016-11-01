@@ -1,4 +1,4 @@
-package dict;
+package structures.dict;
 
 import java.util.Iterator;
 

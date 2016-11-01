@@ -1,4 +1,4 @@
-package dict;
+package structures.dict;
 
 import java.math.BigInteger;
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package heap;
+package structures.heap;
 
 import java.util.Iterator;
 

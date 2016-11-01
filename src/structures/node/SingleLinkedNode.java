@@ -1,4 +1,4 @@
-package node;
+package structures.node;
 
 public class SingleLinkedNode<V> extends Node<V> {
   SingleLinkedNode<V> next;
@@ -13,11 +13,11 @@ public class SingleLinkedNode<V> extends Node<V> {
     this.next = next;
   }
 
-  public SingleLinkedNode<V> getNext() {
+  public SingleLinkedNode<V> next() {
     return this.next;
   }
 
-  protected void setNext(SingleLinkedNode<V> next) {
+  public void setNext(SingleLinkedNode<V> next) {
     this.next = next;
   }
 }

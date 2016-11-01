@@ -1,9 +1,10 @@
 import structures.dict.Dict;
 import structures.dict.LinkedDict;
 
-public class Table<PrimaryKey> {
+public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> {
   private Dict<PrimaryKey, Dict<String, Object>> table;
   private Dict<String, Class<?>> columns;
+  private static final int ROW_THRESHOLD = 500;
 
   public Table() {
     table = new LinkedDict<PrimaryKey, Dict<String, Object>>();

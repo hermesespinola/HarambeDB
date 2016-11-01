@@ -2,6 +2,7 @@ package structures.dict;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.io.Serializable;
 
 @SuppressWarnings("rawtypes")
 public class LinkedDict<Key, Val> implements Dict<Key, Val> {
@@ -12,6 +13,7 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
   private int threshold;
   public static final int INIT_CAP = 5;
   public static final float DEF_LOAD = 0.75f;
+  private static final long serialVersionUID = 2L;
 
   /**
    * @param  initialSize the initial size of the table
@@ -179,10 +181,11 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     if (k == null) throw new NullPointerException();
   }
 
-  private static class DictNode<Key, Val> {
+  private static class DictNode<Key, Val> implements Serializable {
     Key key;
     Val value;
     DictNode<Key, Val> next;
+    private static final long serialVersionUID = 1L;
 
     public DictNode(Key k, Val v, DictNode<Key, Val> nextDictNode)  {
       this.key = k;

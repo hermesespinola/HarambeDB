@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ThreadLocalRandom;
+import java.io.Serializable;
 
 @SuppressWarnings("rawtypes")
 public class OpenAddressingDict<K, V> implements Dict<K, V> {
@@ -15,6 +16,7 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
       private long a, b, p;
       private float loadFactor;
       private int threshold;
+      private static final long serialVersionUID = 3L;
 
       @SuppressWarnings("unchecked")
       public OpenAddressingDict(int initialSize, float loadFactor) {
@@ -282,9 +284,10 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
         return sb.append('}').toString();
       }
 
-      private static class Entry<K, V> {
+      private static class Entry<K, V> implements Serializable {
         K key;
         V value;
+        private static final long serialVersionUID = 4L;
 
         Entry (K k, V v) {
           key = k;

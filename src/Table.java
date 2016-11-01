@@ -1,7 +1,5 @@
 import structures.dict.Dict;
 import structures.dict.LinkedDict;
-import structures.list.List;
-import structures.list.ArrayLinearList;
 
 public class Table<PrimaryKey> {
   private Dict<PrimaryKey, Dict<String, Object>> table;
@@ -61,6 +59,8 @@ public class Table<PrimaryKey> {
     userTable.addColumn("Address", String.class);
     userTable.addRow("Isaac").addRow("Bernie").addRow("Andres");
     userTable.addCell("Isaac", "Address", "Por algún lugar por ahí");
+    userTable.addCell("Bernie", "Address", "Asoinfwoiniwefnoin oiasdn oai");
+    userTable.addCell("Andres", "Address", "que chingue su madre el pri");
     System.out.println(userTable.getCell("Isaac", "Address"));
   }
 }

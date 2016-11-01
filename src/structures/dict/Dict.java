@@ -1,8 +1,9 @@
 package structures.dict;
 
 import java.util.Iterator;
+import java.io.Serializable;
 
-public interface Dict<K,V> {
+public interface Dict<K,V> extends Serializable  {
   public void add(K key, V value);
   public V remove(K key);
   public V getValue(K key);

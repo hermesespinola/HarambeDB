@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 import structures.node.BinaryTreeNode;
+import structures.node.KeyValueNode;
 
 @SuppressWarnings("rawtypes")
 public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
   BSTNode<K, V> root;
+  private static final long serialVersionUID = 06L;
 
   protected static class BSTNode<K extends Comparable<? super K>, V> extends BinaryTreeNode<K, V> implements Comparable<BSTNode<K,V>> {
+    private static final long serialVersionUID = 17L;
     protected BSTNode(K key, V val, BSTNode<K, V> left, BSTNode<K, V> right) {
       super(key, val, left, right);
     }
@@ -31,8 +34,30 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
       if (cmp < 0)
         return this.left() != null ? this.left().get(other) : null;
       else if (cmp > 0)
-        return this.right() != null ? this.left().get(other) : null;
+        return this.right() != null ? this.right().get(other) : null;
       return this.getValue();
+    }
+
+    private KeyValueNode<K,V> getClosest(K other) {
+      int cmp = other.compareTo(this.key);
+      KeyValueNode<K, V> returnValue = null;
+      if (cmp < 0) {
+        returnValue = this.left() != null ? this.left().getClosest(other) : (KeyValueNode<K,V>)this;
+        if (other.compareTo(returnValue.getKey()) > 0) {
+          if (other.compareTo(this.key) > 0) {
+            return (KeyValueNode<K,V>)this;
+          }
+        }
+        return returnValue;
+      } else if (cmp > 0) {
+        returnValue = this.right() != null ? this.right().getClosest(other) : (KeyValueNode<K,V>)this;
+        if (other.compareTo(returnValue.getKey()) < 0) {
+          if (other.compareTo(this.key) > 0) {
+            return (KeyValueNode<K,V>)this;
+          }
+        }
+        return returnValue;
+      } else return (KeyValueNode<K,V>)this;
     }
 
     protected void add(K other, V val) {
@@ -164,6 +189,10 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
     return root.get(key);
   }
 
+  public KeyValueNode<K,V> getClosest(K key) {
+    return root.getClosest(key);
+  }
+
   public void put(K key, V val) {
     BSTNode<K, V> current = root;
     while (current != null) {
@@ -276,18 +305,23 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
   public static void main(String[] args) {
     BST<Integer, String> bst = new BST<>(3, "tres");
     bst.add(2, "dos");
-    bst.put(4, "cuatro");
     bst.put(1, "uno");
     bst.add(0, "cero");
-    bst.put(6, "seis");
     bst.put(9, "nueve");
     bst.add(8, "ocho");
-    bst.put(5, "cinco");
     bst.put(7, "siete");
 
     // Iterator
     for (String val : bst) {
       System.out.println(val);
     }
+    System.out.println("Closest value to 5:(tres)");
+    System.out.println(bst.getClosest(5));
+    System.out.println("Closest value to -10:(cero)");
+    System.out.println(bst.getClosest(-10));
+    System.out.println("Closest value to 8:(tres)");
+    System.out.println(bst.getClosest(8));
+    System.out.println("Closest value to 100:(nueve)");
+    System.out.println(bst.getClosest(100));
   }
 }

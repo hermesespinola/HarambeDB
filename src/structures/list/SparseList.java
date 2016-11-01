@@ -6,6 +6,7 @@ import structures.node.SparseNode;
 public class SparseList<V> implements List<V> {
   private static class SparseListNode<V> extends SparseNode<V> {
     SparseListNode<V> nextNode;
+    private static final long serialVersionUID = 14l;
 
     SparseListNode(int index, V val, SparseListNode<V> nextNode) {
       super(index, val);

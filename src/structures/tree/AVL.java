@@ -6,8 +6,10 @@ import java.util.Stack;
 * Implementation of an AVL tree extending a binary search tree with key value pairs.
 */
 public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
+  private static final long serialVersionUID = 11L;
   private static class AVLNode<K extends Comparable<? super K>, V> extends BSTNode<K, V> {
     protected int height;
+    private static final long serialVersionUID = 15L;
 
     protected AVLNode(K key, V value, AVLNode<K,V> leftNode, AVLNode<K,V> rightNode) {
       super(key, value, leftNode, rightNode);
@@ -191,55 +193,5 @@ public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
 
   public AVLNode<K,V> root() {
     return (AVLNode<K,V>)root;
-  }
-
-  public static void main(String[] args) {
-    AVL<Integer, String> avl = new AVL<>();
-    avl.add(2, "Dos");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(1, "Uno");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(4, "Cuatro");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(3, "Tres");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(6, "Seis");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(5, "Cinco");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(-2, "-Dos");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(-4, "-Cuatro");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(-3, "-Tres");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(-1, "-Uno");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println();
-    avl.add(0, "Cero");
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
-    System.out.println(avl.remove(-2));
-    System.out.println(avl);
-    System.out.println(avl.levelOrder());
   }
 }

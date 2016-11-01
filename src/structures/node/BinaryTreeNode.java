@@ -3,6 +3,7 @@ package structures.node;
 public class BinaryTreeNode<K, V> extends KeyValueNode<K, V> {
   BinaryTreeNode<K, V> left;
   BinaryTreeNode<K, V> right;
+  private static final long serialVersionUID = 13l;
 
   public BinaryTreeNode(K key, V val, BinaryTreeNode<K, V> left, BinaryTreeNode<K, V> right) {
     super(key, val);

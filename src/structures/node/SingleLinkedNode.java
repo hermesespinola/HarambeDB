@@ -2,6 +2,7 @@ package structures.node;
 
 public class SingleLinkedNode<V> extends Node<V> {
   SingleLinkedNode<V> next;
+  private static final long serialVersionUID = 13l;
 
   public SingleLinkedNode(V val) {
     super(val);

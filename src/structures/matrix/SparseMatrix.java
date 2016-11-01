@@ -7,6 +7,7 @@ import structures.node.SparseNode;
 public class SparseMatrix<T> implements Matrix<T> {
   private static class SparseMatrixNode<T> extends SparseNode<T> {
     int col;
+    private static final long serialVersionUID = 12l;
 
     SparseMatrixNode(int col, int row, T val) {
       super(row, val);

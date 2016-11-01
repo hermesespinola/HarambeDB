@@ -2,6 +2,7 @@ package structures.node;
 
 public class KeyValueNode<K, V> extends Node<V> {
   protected K key;
+  private static final long serialVersionUID = 18L;
 
   public KeyValueNode(K key, V val) {
     super(val);

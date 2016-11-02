@@ -42,7 +42,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     if (!tableDir.exists()) {
       try {
         tableDir.mkdir();
-        this.save();
+        ObjectOutputStream oos = new ObjectOutputStream(
+          new FileOutputStream("../" + tableName + '/' + tableName + extension));
+        oos.writeObject(this);
+        oos.close();
       } catch (SecurityException se) {
         se.printStackTrace();
       }
@@ -68,16 +71,17 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     // move half of the current partition to the new partition...
     for (int i = tableKeys.size()/2; i < tableKeys.size(); i++) {
       newTableSegment.add(tableKeys.get(i), table.getValue(tableKeys.get(i)));
+      table.remove(tableKeys.get(i));
     }
     createNewPartition(newTableSegment, tableKeys.get(0));
   }
 
   public Table<PrimaryKey> addRow(PrimaryKey key) {
-    if (currentPartitionLesserKey == null) {
+    if (tablePartitions.isEmpty()) {
       currentPartitionLesserKey = key;
-      if (tablePartitions.isEmpty()) {
-        tablePartitions.add(key, currentPartitionPath);
-      }
+      currentPartitionPath = "../" + tableName + '/' + tableName + partitionCount + ".hbsg";
+      tablePartitions.add(key, currentPartitionPath);
+      partitionCount++;
     } else if (key.compareTo(currentPartitionLesserKey) < 0) {
       if (tablePartitions.contains(currentPartitionLesserKey)) {
         tablePartitions.remove(currentPartitionLesserKey);
@@ -227,11 +231,28 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     users.addColumn("Address", String.class);
 
     users.addRow("Manolo");
+    users.addCell("Manolo", "Address", "Manolo address");
     users.addRow("Lucio");
-    users.addRow("Teletubi");
-    users.addRow("Miguel");
-    users.addRow("Miguelito");
-    users.addRow("Chuck");
-    // System.out.println(users.table.keys());
+    users.addCell("Lucio", "Address", "Lucio address");
+    // users.addRow("Teletubi");
+    // users.addCell("Teletubi", "Address", "Teletubi address");
+    // users.addRow("Miguel");
+    // users.addCell("Miguel", "Address", "Miguel address");
+    // users.addRow("Miguelito");
+    // users.addCell("Miguelito", "Address", "Miguelito address");
+    // users.addRow("Chuck");
+    // users.addCell("Chuck", "Address", "Chuck address");
+
+    System.out.println(users.tablePartitions);
+    System.out.println(users.tablePartitions.get("Lucio"));
+    System.out.println(users.tablePartitions.get("Chuck"));
+    System.out.println(users.tablePartitions.get("Manolo"));
+
+    // System.out.println(users.getRow("Chuck"));
+    // System.out.println(users.getRow("Teletubi"));
+    // System.out.println(users.getRow("Miguelito"));
+    // System.out.println(users.getRow("Lucio"));
+    // System.out.println(users.getRow("Manolo"));
+    // System.out.println(users.getRow("Miguel"));
   }
 }

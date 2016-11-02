@@ -20,13 +20,13 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private AVL<PrimaryKey, String> tablePartitions;
   // name of the table
   private String tableName;
-  // number of segments
+  // number of partitions
   private int partitionCount;
   // dictionary of columns and their data types
   private Dict<String, Class<?>> columns;
-  // segment of the table, dictionary of rows
+  // partition of the table, dictionary of rows
   private transient Dict<PrimaryKey, Dict<String, Object>> table;
-  // maximum number of entries before segmenting the table
+  // maximum number of entries before partitioning the table
   private transient static final int THRESHOLD = 5;
   private transient String currentPartitionPath;
   private transient PrimaryKey currentPartitionLesserKey;
@@ -63,39 +63,35 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   // cut lesser values of current table and paste it in the next table with lesserKey (left child)
   //
   private final void rebalancePartitions() {
-    // FIXME: only works if table is LinkedDict.
+    // FIXME: only works if table is LinkedDict (modify OpenAddressingDict).
     ArrayList<PrimaryKey> tableKeys = (ArrayList<PrimaryKey>) table.keys();
     Collections.sort(tableKeys);
     // create a new partition ...
-    Dict<PrimaryKey, Dict<String, Object>> newTableSegment = new LinkedDict<>();
+    Dict<PrimaryKey, Dict<String, Object>> newPartition = new LinkedDict<>();
     // move half of the current partition to the new partition...
     for (int i = tableKeys.size()/2; i < tableKeys.size(); i++) {
-      newTableSegment.add(tableKeys.get(i), table.getValue(tableKeys.get(i)));
+      newPartition.add(tableKeys.get(i), table.getValue(tableKeys.get(i)));
       table.remove(tableKeys.get(i));
     }
-    createNewPartition(newTableSegment, tableKeys.get(0));
+    createNewPartition(newPartition, tableKeys.get(tableKeys.size()/2));
   }
 
   public Table<PrimaryKey> addRow(PrimaryKey key) {
     if (tablePartitions.isEmpty()) {
       currentPartitionLesserKey = key;
       currentPartitionPath = "../" + tableName + '/' + tableName + partitionCount + ".hbsg";
-      tablePartitions.add(key, currentPartitionPath);
-      partitionCount++;
+      saveCurrentPartition();
     } else if (key.compareTo(currentPartitionLesserKey) < 0) {
-      if (tablePartitions.contains(currentPartitionLesserKey)) {
-        tablePartitions.remove(currentPartitionLesserKey);
-        tablePartitions.add(key, currentPartitionPath);
-      }
+      tablePartitions.remove(currentPartitionLesserKey);
+      tablePartitions.add(key, currentPartitionPath);
       currentPartitionLesserKey = key;
     }
 
     loadPartition(key);
-    if (table.getSize() == THRESHOLD) {
-      rebalancePartitions();
-      loadPartition(key);
-    }
     table.add(key, new LinkedDict<String, Object>());
+    if (table.getSize() > THRESHOLD) {
+      rebalancePartitions();
+    }
     return this;
   }
 
@@ -135,38 +131,33 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     }
   }
 
-  // saves segment to file and add it to the segments tree.
-  private final void createNewPartition(Dict<PrimaryKey, Dict<String, Object>> segment, PrimaryKey lesserKey) {
-    String path = "../" + tableName + '/' + tableName + partitionCount + ".hbsg";
+  // saves partition to file and add it to the parition tree.
+  private final void createNewPartition(Dict<PrimaryKey, Dict<String, Object>> pt, PrimaryKey lesserKey) {
+    String path = "../" + tableName + '/' + tableName + ++partitionCount + ".hbsg";
     try (ObjectOutputStream oos = new ObjectOutputStream(
     new FileOutputStream(path))) {
-      oos.writeObject(segment);
+      oos.writeObject(pt);
       tablePartitions.add(lesserKey, path);
-      tablePartitions.add(lesserKey, path);
-      partitionCount++;
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
   private final void saveCurrentPartition() {
-    // TODO: Make this more elegant (?)
     if (currentPartitionLesserKey == null) {
       return;
     }
-    if (currentPartitionPath == null) {
-      // file is not in the avl tree and there is no file for this segment
-      currentPartitionPath = "../" + tableName + '/' + tableName + partitionCount + ".hbsg";
+    if (!tablePartitions.contains(currentPartitionLesserKey)) {
+      // file is not in the avl tree and there is no file for this partition
       try (ObjectOutputStream oos = new ObjectOutputStream(
       new FileOutputStream(currentPartitionPath))) {
         oos.writeObject(table);
         tablePartitions.add(currentPartitionLesserKey, currentPartitionPath);
-        partitionCount++;
       } catch (Exception e) {
         e.printStackTrace();
       }
     } else {
-      // file is already in the avl tree and there is already a file for this segment
+      // file is already in the avl tree and there is already a file for this partition
       try (ObjectOutputStream oos = new ObjectOutputStream(
       new FileOutputStream(currentPartitionPath))) {
         oos.writeObject(table);
@@ -177,22 +168,19 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   }
 
   @SuppressWarnings("unchecked")
-  private final Dict<PrimaryKey, Dict<String, Object>> loadPartition(PrimaryKey keyInRange) {
+  private final void loadPartition(PrimaryKey keyInRange) {
     KeyValueNode<PrimaryKey,String> partitionInfo = tablePartitions.getClosest(keyInRange);
     if (partitionInfo.getKey().compareTo(currentPartitionLesserKey) != 0) {
-      if (currentPartitionPath != partitionInfo.getValue()) {
-        try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-        new FileInputStream(partitionInfo.getValue())))) {
-          saveCurrentPartition();
-          currentPartitionPath = partitionInfo.getValue();
-          currentPartitionLesserKey = partitionInfo.getKey();
-          return (Dict<PrimaryKey, Dict<String, Object>>) ois.readObject();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
+      try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
+      new FileInputStream(partitionInfo.getValue())))) {
+        saveCurrentPartition();
+        currentPartitionPath = partitionInfo.getValue();
+        currentPartitionLesserKey = partitionInfo.getKey();
+        table = (Dict<PrimaryKey, Dict<String, Object>>) ois.readObject();
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
-    return null;
   }
 
   private final void save() {
@@ -226,6 +214,13 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
 
   public static void main(String[] args) throws IOException {
+    // try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
+    // new FileInputStream("../Users/Users1.hbsg")))) {
+    //   System.out.println((Dict<String, Dict<String, Object>>) ois.readObject());
+    // } catch (Exception e) {
+    //   e.printStackTrace();
+    // }
+
     Table<String> users = new Table<String>("Users");
 
     users.addColumn("Address", String.class);
@@ -234,25 +229,20 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     users.addCell("Manolo", "Address", "Manolo address");
     users.addRow("Lucio");
     users.addCell("Lucio", "Address", "Lucio address");
-    // users.addRow("Teletubi");
-    // users.addCell("Teletubi", "Address", "Teletubi address");
-    // users.addRow("Miguel");
-    // users.addCell("Miguel", "Address", "Miguel address");
-    // users.addRow("Miguelito");
-    // users.addCell("Miguelito", "Address", "Miguelito address");
-    // users.addRow("Chuck");
-    // users.addCell("Chuck", "Address", "Chuck address");
+    users.addRow("Teletubi");
+    users.addCell("Teletubi", "Address", "Teletubi address");
+    users.addRow("Miguel");
+    users.addCell("Miguel", "Address", "Miguel address");
+    users.addRow("Miguelito");
+    users.addCell("Miguelito", "Address", "Miguelito address");
+    users.addRow("Chuck");
+    users.addCell("Chuck", "Address", "Chuck address");
 
-    System.out.println(users.tablePartitions);
-    System.out.println(users.tablePartitions.get("Lucio"));
-    System.out.println(users.tablePartitions.get("Chuck"));
-    System.out.println(users.tablePartitions.get("Manolo"));
-
-    // System.out.println(users.getRow("Chuck"));
-    // System.out.println(users.getRow("Teletubi"));
-    // System.out.println(users.getRow("Miguelito"));
-    // System.out.println(users.getRow("Lucio"));
-    // System.out.println(users.getRow("Manolo"));
-    // System.out.println(users.getRow("Miguel"));
+    System.out.println(users.getRow("Teletubi"));
+    System.out.println(users.getRow("Chuck"));
+    System.out.println(users.getRow("Miguelito"));
+    System.out.println(users.getRow("Lucio"));
+    System.out.println(users.getRow("Miguel"));
+    System.out.println(users.getRow("Manolo"));
   }
 }

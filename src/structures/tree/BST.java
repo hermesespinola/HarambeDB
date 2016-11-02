@@ -39,6 +39,7 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
     }
 
     private KeyValueNode<K,V> getClosest(K other) {
+      System.out.println(this.key);
       int cmp = other.compareTo(this.key);
       KeyValueNode<K, V> returnValue = null;
       if (cmp < 0) {

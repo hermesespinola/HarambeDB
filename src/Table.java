@@ -11,40 +11,44 @@ import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.util.Collections;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
-  // avl tree containing the location and first value of the diferent segments of the table
-  private AVL<PrimaryKey, String> tableSegments;
+  // avl tree containing the location and first value of the diferent partitions of the table
+  private AVL<PrimaryKey, String> tablePartitions;
   // name of the table
   private String tableName;
   // number of segments
-  private int segmentCount;
+  private int partitionCount;
   // dictionary of columns and their data types
   private Dict<String, Class<?>> columns;
-  // dictionary of rows
+  // segment of the table, dictionary of rows
   private transient Dict<PrimaryKey, Dict<String, Object>> table;
   // maximum number of entries before segmenting the table
   private transient static final int THRESHOLD = 5;
-  private transient String currentSegmentPath;
-  private transient PrimaryKey currentSegmentLesserKey;
+  private transient String currentPartitionPath;
+  private transient PrimaryKey currentPartitionLesserKey;
   private static final long serialVersionUID = 05L;
   public transient static final String extension = ".hbtb";
 
-  public Table(String tableName) {
+  public Table(String tableName) throws IOException {
     table = new LinkedDict<PrimaryKey, Dict<String, Object>>();
     columns = new LinkedDict<String, Class<?>>();
-    tableSegments = new AVL<PrimaryKey, String>();
+    tablePartitions = new AVL<PrimaryKey, String>();
     this.tableName = tableName;
     File tableDir = new File("../" + tableName);
     if (!tableDir.exists()) {
       try {
         tableDir.mkdir();
+        this.save();
       } catch (SecurityException se) {
         se.printStackTrace();
       }
     } else {
       // TODO: hacer más cosas
-      System.out.println("Table already exists");
+      throw new IOException("Table already exists");
     }
   }
 
@@ -55,47 +59,50 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   // cut lesser values of current table and paste it in the next table with lesserKey (left child)
   //
-  private final void rebalanceSegments() {
+  private final void rebalancePartitions() {
     // FIXME: only works if table is LinkedDict.
     ArrayList<PrimaryKey> tableKeys = (ArrayList<PrimaryKey>) table.keys();
     Collections.sort(tableKeys);
     System.out.println(tableKeys);
-    // cases:
-    // 1. no left node
-    // 2. left node not enough space : rebalance left node table
-
+    // create a new partition ...
+    Dict<PrimaryKey, Dict<String, Object>> newTableSegment = new LinkedDict<>();
+    // move half of the current partition to the new partition...
+    for (int i = tableKeys.size()/2; i < tableKeys.size(); i++) {
+      newTableSegment.add(tableKeys.get(i), table.getValue(tableKeys.get(i)));
+      table.remove(tableKeys.get(i));
+    }
+    createNewSegment(newTableSegment, tableKeys.get(0));
   }
 
   public Table<PrimaryKey> addRow(PrimaryKey key) {
-    if (tableSegments.isEmpty()) {
-      table.add(key, new LinkedDict<String, Object>());
-    } else {
-      // segment where data should go
-      KeyValueNode<PrimaryKey,String> segmentNode = tableSegments.getClosest(key);
-      if (segmentNode.getKey().compareTo(currentSegmentLesserKey) != 0) {
-        loadSegment(segmentNode.getValue(), segmentNode.getKey()); // TODO: guardar el otro
+    if (currentPartitionLesserKey == null) {
+      currentPartitionLesserKey = key;
+      System.out.println(tablePartitions.isEmpty());
+      if (tablePartitions.isEmpty()) {
+        tablePartitions.add(key, currentPartitionPath);
       }
-
-      if (table.getSize() == THRESHOLD) {
-        // rebalance the table segments
-        rebalanceSegments();
+    } else if (key.compareTo(currentPartitionLesserKey) < 0) {
+      if (tablePartitions.contains(currentPartitionLesserKey)) {
+        tablePartitions.remove(currentPartitionLesserKey);
+        tablePartitions.add(key, currentPartitionPath);
       }
-
-      table.add(key, new LinkedDict<String, Object>());
+      currentPartitionLesserKey = key;
     }
 
-    if (currentSegmentLesserKey == null) {
-      currentSegmentLesserKey = key;
-    } else if (key.compareTo(currentSegmentLesserKey) < 0) {
-      if (tableSegments.contains(currentSegmentLesserKey)) {
-        tableSegments.remove(currentSegmentLesserKey);
-        tableSegments.add(key, currentSegmentPath);
-      }
-      currentSegmentLesserKey = key;
+    // partition where data should go
+    KeyValueNode<PrimaryKey,String> segmentNode = tablePartitions.getClosest(key);
+    if (segmentNode.getKey().compareTo(currentPartitionLesserKey) != 0) {
+      loadSegment(segmentNode.getValue(), segmentNode.getKey()); // TODO: guardar el otro
     }
+    if (table.getSize() == THRESHOLD) {
+      rebalancePartitions();
+    }
+    table.add(key, new LinkedDict<String, Object>());
+
     return this;
   }
 
+  // TODO: search in the partition tree.
   public Dict<String, Object> getRow(PrimaryKey key) {
     Dict<String, Object> row = table.getValue(key);
     if (row == null) {
@@ -104,6 +111,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return row;
   }
 
+  // TODO: search in the partition tree.
   public Object getCell(PrimaryKey key, String column) {
     checkColumn(column);
     Dict<String, Object> row = getRow(key);
@@ -114,6 +122,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return columns.getValue(columnName);
   }
 
+  // TODO: search in the partition tree.
   public Table<PrimaryKey> addCell(PrimaryKey key, String column, Object value) {
     checkColumn(column);
     checkColumnType(column, value);
@@ -134,22 +143,40 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     }
   }
 
+  // saves segment to file and add it to the segments tree.
+  private final void createNewSegment(Dict<PrimaryKey, Dict<String, Object>> segment, PrimaryKey lesserKey) {
+    String path = "../" + tableName + '/' + tableName + partitionCount + ".hseg";
+    try (ObjectOutputStream oos = new ObjectOutputStream(
+    new FileOutputStream(path))) {
+      oos.writeObject(segment);
+      tablePartitions.add(lesserKey, path);
+      tablePartitions.add(lesserKey, path);
+      partitionCount++;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   private final void saveCurrentSegment() {
-    if (currentSegmentPath == null) {
+    // TODO: Make this more elegant (?)
+    if (currentPartitionLesserKey == null) {
+      return;
+    }
+    if (currentPartitionPath == null) {
       // file is not in the avl tree and there is no file for this segment
-      currentSegmentPath = "../" + tableName + '/' + tableName + segmentCount + ".hseg";
+      currentPartitionPath = "../" + tableName + '/' + tableName + partitionCount + ".hseg";
       try (ObjectOutputStream oos = new ObjectOutputStream(
-      new FileOutputStream(currentSegmentPath))) {
+      new FileOutputStream(currentPartitionPath))) {
         oos.writeObject(table);
-        tableSegments.add(currentSegmentLesserKey, currentSegmentPath);
-        segmentCount++;
+        tablePartitions.add(currentPartitionLesserKey, currentPartitionPath);
+        partitionCount++;
       } catch (Exception e) {
         e.printStackTrace();
       }
     } else {
       // file is already in the avl tree and there is already a file for this segment
       try (ObjectOutputStream oos = new ObjectOutputStream(
-      new FileOutputStream(currentSegmentPath))) {
+      new FileOutputStream(currentPartitionPath))) {
         oos.writeObject(table);
       } catch (Exception e) {
         e.printStackTrace();
@@ -159,12 +186,12 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   @SuppressWarnings("unchecked")
   private final Dict<PrimaryKey, Dict<String, Object>> loadSegment(String path, PrimaryKey lesserKey) {
-    if (currentSegmentPath != path) {
+    if (currentPartitionPath != path) {
       try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
       new FileInputStream(path)))) {
         saveCurrentSegment();
-        currentSegmentPath = path;
-        currentSegmentLesserKey = lesserKey;
+        currentPartitionPath = path;
+        currentPartitionLesserKey = lesserKey;
         return (Dict<PrimaryKey, Dict<String, Object>>) ois.readObject();
       } catch (Exception e) {
         e.printStackTrace();
@@ -193,14 +220,24 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return null;
   }
 
-  public static void main(String[] args) {
-    Table<String> userTable = new Table<String>("Users");
-    userTable.addColumn("Address", String.class);
-    userTable.addRow("Isaac").addRow("Bernie").addRow("Andres");
-    userTable.addCell("Isaac", "Address", "Por algún lugar por ahí");
-    userTable.addCell("Bernie", "Address", "Asoinfwoiniwefnoin oiasdn oai");
-    userTable.addCell("Andres", "Address", "que chingue su madre el pri");
-    userTable.save();
-    System.out.println(userTable.getCell("Isaac", "Address"));
+  public static final void showMenu() {
+    System.out.println("1) Create table");
+    System.out.println("2) Load table");
+    System.out.println("3) Save table");
+    System.out.println("4) Add column");
+    System.out.println("5) Add row");
+    System.out.print(": ");
+  }
+
+
+  public static void main(String[] args) throws IOException {
+    Table<String> users = new Table<String>("Users");
+
+    users.addColumn("Address", String.class);
+
+    users.addRow("Manolo");
+    users.addRow("Lucio");
+    users.addRow("Miguelito");
+    users.rebalancePartitions();
   }
 }

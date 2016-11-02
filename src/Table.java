@@ -71,7 +71,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       newTableSegment.add(tableKeys.get(i), table.getValue(tableKeys.get(i)));
       table.remove(tableKeys.get(i));
     }
-    createNewSegment(newTableSegment, tableKeys.get(0));
+    createNewPartition(newTableSegment, tableKeys.get(0));
   }
 
   public Table<PrimaryKey> addRow(PrimaryKey key) {
@@ -89,11 +89,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       currentPartitionLesserKey = key;
     }
 
-    // partition where data should go
-    KeyValueNode<PrimaryKey,String> segmentNode = tablePartitions.getClosest(key);
-    if (segmentNode.getKey().compareTo(currentPartitionLesserKey) != 0) {
-      loadSegment(segmentNode.getValue(), segmentNode.getKey()); // TODO: guardar el otro
-    }
+    loadPartition(key);
     if (table.getSize() == THRESHOLD) {
       rebalancePartitions();
     }
@@ -102,16 +98,12 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return this;
   }
 
-  // TODO: search in the partition tree.
   public Dict<String, Object> getRow(PrimaryKey key) {
+    loadPartition(key);
     Dict<String, Object> row = table.getValue(key);
-    if (row == null) {
-      throw new RuntimeException("No such row");
-    }
     return row;
   }
 
-  // TODO: search in the partition tree.
   public Object getCell(PrimaryKey key, String column) {
     checkColumn(column);
     Dict<String, Object> row = getRow(key);
@@ -122,7 +114,6 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return columns.getValue(columnName);
   }
 
-  // TODO: search in the partition tree.
   public Table<PrimaryKey> addCell(PrimaryKey key, String column, Object value) {
     checkColumn(column);
     checkColumnType(column, value);
@@ -133,7 +124,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   private final void checkColumn(final String column) {
     if (columns.getValue(column) == null) {
-      throw new RuntimeException("No such Column");
+      throw new RuntimeException("No such Column"); // TODO: create a HarambException c:
     }
   }
 
@@ -144,7 +135,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   }
 
   // saves segment to file and add it to the segments tree.
-  private final void createNewSegment(Dict<PrimaryKey, Dict<String, Object>> segment, PrimaryKey lesserKey) {
+  private final void createNewPartition(Dict<PrimaryKey, Dict<String, Object>> segment, PrimaryKey lesserKey) {
     String path = "../" + tableName + '/' + tableName + partitionCount + ".hseg";
     try (ObjectOutputStream oos = new ObjectOutputStream(
     new FileOutputStream(path))) {
@@ -157,7 +148,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     }
   }
 
-  private final void saveCurrentSegment() {
+  private final void saveCurrentPartition() {
     // TODO: Make this more elegant (?)
     if (currentPartitionLesserKey == null) {
       return;
@@ -185,16 +176,19 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   }
 
   @SuppressWarnings("unchecked")
-  private final Dict<PrimaryKey, Dict<String, Object>> loadSegment(String path, PrimaryKey lesserKey) {
-    if (currentPartitionPath != path) {
-      try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-      new FileInputStream(path)))) {
-        saveCurrentSegment();
-        currentPartitionPath = path;
-        currentPartitionLesserKey = lesserKey;
-        return (Dict<PrimaryKey, Dict<String, Object>>) ois.readObject();
-      } catch (Exception e) {
-        e.printStackTrace();
+  private final Dict<PrimaryKey, Dict<String, Object>> loadPartition(PrimaryKey keyInRange) {
+    KeyValueNode<PrimaryKey,String> partitionInfo = tablePartitions.getClosest(keyInRange);
+    if (partitionInfo.getKey().compareTo(currentPartitionLesserKey) != 0) {
+      if (currentPartitionPath != partitionInfo.getValue()) {
+        try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
+        new FileInputStream(partitionInfo.getValue())))) {
+          saveCurrentPartition();
+          currentPartitionPath = partitionInfo.getValue();
+          currentPartitionLesserKey = partitionInfo.getKey();
+          return (Dict<PrimaryKey, Dict<String, Object>>) ois.readObject();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
     }
     return null;
@@ -203,7 +197,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private final void save() {
     try (ObjectOutputStream oos = new ObjectOutputStream(
       new FileOutputStream("../" + tableName + '/' + tableName + extension))) {
-      saveCurrentSegment();
+      saveCurrentPartition();
       oos.writeObject(this);
     } catch (Exception e) {
       e.printStackTrace();

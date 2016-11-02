@@ -27,7 +27,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   // partition of the table, dictionary of rows
   private transient Dict<PrimaryKey, Dict<String, Object>> table;
   // maximum number of entries before partitioning the table
-  private transient static final int THRESHOLD = 5;
+  private transient static final int THRESHOLD = 1;
   private transient String currentPartitionPath;
   private transient PrimaryKey currentPartitionLesserKey;
   private static final long serialVersionUID = 05L;
@@ -61,7 +61,6 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   }
 
   // cut lesser values of current table and paste it in the next table with lesserKey (left child)
-  //
   private final void rebalancePartitions() {
     // FIXME: only works if table is LinkedDict (modify OpenAddressingDict).
     ArrayList<PrimaryKey> tableKeys = (ArrayList<PrimaryKey>) table.keys();
@@ -74,6 +73,18 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       table.remove(tableKeys.get(i));
     }
     createNewPartition(newPartition, tableKeys.get(tableKeys.size()/2));
+  }
+
+  public Table<PrimaryKey> removeRow(PrimaryKey key) {
+    loadPartition(key);
+    table.remove(key);
+    return this;
+  }
+
+  public Table<PrimaryKey> removeCell(PrimaryKey key, String column) throws Exception {
+    Dict<String, Object> row = getRow(key);
+    row.remove(column);
+    return this;
   }
 
   public Table<PrimaryKey> addRow(PrimaryKey key) {
@@ -95,13 +106,16 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return this;
   }
 
-  public Dict<String, Object> getRow(PrimaryKey key) {
+  public Dict<String, Object> getRow(PrimaryKey key) throws Exception {
     loadPartition(key);
     Dict<String, Object> row = table.getValue(key);
+    if (row == null) {
+      throw new Exception("No such row");
+    }
     return row;
   }
 
-  public Object getCell(PrimaryKey key, String column) {
+  public Object getCell(PrimaryKey key, String column) throws Exception {
     checkColumn(column);
     Dict<String, Object> row = getRow(key);
     return row.getValue(column);
@@ -111,7 +125,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return columns.getValue(columnName);
   }
 
-  public Table<PrimaryKey> addCell(PrimaryKey key, String column, Object value) {
+  public Table<PrimaryKey> addCell(PrimaryKey key, String column, Object value) throws Exception {
     checkColumn(column);
     checkColumnType(column, value);
     Dict<String, Object> row = getRow(key);
@@ -213,7 +227,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   }
 
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws Exception {
     // try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
     // new FileInputStream("../Users/Users1.hbsg")))) {
     //   System.out.println((Dict<String, Dict<String, Object>>) ois.readObject());
@@ -244,5 +258,11 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     System.out.println(users.getRow("Lucio"));
     System.out.println(users.getRow("Miguel"));
     System.out.println(users.getRow("Manolo"));
+
+    users.removeCell("Lucio", "Address");
+    System.out.println(users.getRow("Lucio"));
+    System.out.println(users.getCell("Lucio", "Address"));
+    users.removeRow("Lucio");
+    System.out.println(users.getRow("Lucio"));
   }
 }

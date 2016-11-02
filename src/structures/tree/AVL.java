@@ -31,13 +31,6 @@ public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
     public AVLNode<K,V> right() {
       return (AVLNode<K,V>)super.right();
     }
-
-    @Override
-    public V remove(K other) {
-      V r = super.remove(key);
-      this.height = Math.max(nodeHeight(this.left()), nodeHeight(this.right())) + 1;
-      return r;
-    }
   }
 
   public AVL() {
@@ -46,44 +39,6 @@ public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
 
   public AVL(K rootKey, V rootValue) {
     super(rootKey, rootValue);
-  }
-
-  /*
-  * iterative version of method add
-  * @param key The key of the new Node.
-  * @param val The value of the new node
-  */
-  @Override
-  public void put(K key, V val) {
-    Stack<AVLNode<K,V>> path = new Stack<>();
-    path.push((AVLNode<K,V>)root);
-    AVLNode<K, V> current = (AVLNode<K,V>)root;
-    while (!path.empty()) {
-      if (current == null)
-        current = new AVLNode<K,V>(key, val);
-      else if (key.compareTo(current.getKey()) < 0) {
-        path.push(current.left());
-        if (nodeHeight(current.left()) - nodeHeight(current.right()) == 2)
-          if (key.compareTo(current.left().getKey()) < 0)
-            current = singleRightRotation(current);
-          else
-            current = doubleRightRotation(current);
-
-      } else if (key.compareTo(current.getKey()) > 0) {
-
-        path.push(current.right());
-        if (nodeHeight(current.right()) - nodeHeight(current.left()) == 2)
-          if (key.compareTo(current.right().getKey()) < 0)
-            current = singleLeftRotation(current);
-          else
-            current = doubleLeftRotation(current);
-
-      } else {
-        current.setValue(val);
-      }
-      current.height = Math.max(nodeHeight(current.left()), nodeHeight(current.right())) + 1;
-      current = path.pop();
-    }
   }
 
   /*
@@ -97,13 +52,76 @@ public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
     this.size++;
   }
 
+  /*
+  * Recursively remove the node with the specified key and rebalance the tree.
+  * @param key The key of the node to remove.
+  */
   @Override
-  public V remove(K key) {
-    V ret = root().remove(key);
-    if (ret != null) {
-      this.size--;
+  public void remove(K key) {
+    root = remove(key, root());
+  }
+
+  /*
+  * The actual remove method
+  * @param key The key of the node to remove.
+  * @param node root of the where the child node is to be deleted.
+  */
+  @SuppressWarnings("unchecked")
+  protected AVLNode<K,V> remove(K key, AVLNode<K,V> node) {
+    if (node == null)
+      return null;
+    if (key.compareTo(node.getKey()) < 0) {
+
+      node.setLeft(remove(key, node.left()));
+      if (nodeHeight(node.right()) - nodeHeight(node.left()) >= 2) {
+        int rightHeight = nodeHeight(node.right().right());
+        int leftHeight = nodeHeight(node.right().left());
+
+        if (rightHeight >= leftHeight) {
+          node = singleLeftRotation(node);
+        } else {
+          node = doubleLeftRotation(node);
+        }
+      }
+
+    } else if (key.compareTo(node.getKey()) > 0) {
+
+      node.setRight(remove(key, node.right()));
+      if (nodeHeight(node.left()) - nodeHeight(node.right()) >= 2) {
+        int leftHeight = nodeHeight(node.left().left());
+        int rightHeight = nodeHeight(node.left().right());
+
+        if (leftHeight >= rightHeight) {
+          node = singleRightRotation(node);
+        } else {
+          node = doubleRightRotation(node);
+        }
+      }
+
+    } else if (node.left() != null) { // key == node.key (remove this node)
+      BSTNode<K,V> greaterLeft = node.left().greater();
+      node.setValue(greaterLeft.getValue());
+      node.setKey(greaterLeft.getKey());
+
+      node.setLeft(remove(greaterLeft.getKey(), node.left()));
+      if (nodeHeight(node.right()) - nodeHeight(node.left()) >= 2) {
+        int rightHeight = nodeHeight(node.right().right());
+        int leftHeight = nodeHeight(node.right().left());
+        if (rightHeight >= leftHeight) {
+          node = singleLeftRotation(node);
+        } else {
+          node = doubleLeftRotation(node);
+        }
+      }
+    } else {
+      node = node.left() != null ? node.left() : node.right();
     }
-    return ret;
+
+    // update the current node height
+    if (node != null)
+      node.height = Math.max(nodeHeight(node.left()), nodeHeight(node.right())) + 1;
+
+    return node;
   }
 
   /*
@@ -199,5 +217,32 @@ public class AVL<K extends Comparable<? super K>, V> extends BST<K, V> {
 
   public AVLNode<K,V> root() {
     return (AVLNode<K,V>)root;
+  }
+
+  public static void main(String[] args) {
+    AVL<Integer, String> avl = new AVL<>();
+    avl.add(84, "84");
+    avl.add(10, "10");
+    avl.add(8, "8");
+    avl.add(92, "92");
+    avl.add(66, "66");
+    avl.add(88, "88");
+    avl.add(29, "29");
+    avl.add(27, "27");
+    avl.add(75, "75");
+    avl.add(72, "72");
+    avl.add(68, "68");
+    avl.add(62, "62");
+    avl.add(18, "18");
+    avl.add(80, "80");
+    avl.add(36, "36");
+    avl.add(1, "1");
+    avl.add(40, "40");
+
+    avl.remove(92);
+    avl.remove(8);
+    avl.remove(36);
+    avl.remove(1);
+    System.out.println(avl);
   }
 }

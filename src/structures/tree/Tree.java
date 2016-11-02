@@ -12,7 +12,7 @@ public interface Tree<K, V> extends Iterable<V>, Serializable {
   public KeyValueNode<K,V> getClosest(K key);
   public boolean contains(K key);
   public int size();
-  public V remove(K key);
+  public void remove(K key);
   public String toString();
   public int height();
   public Iterator<V> iterator();

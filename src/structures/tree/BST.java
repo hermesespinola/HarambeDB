@@ -94,13 +94,12 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
       return (BSTNode<K,V>)super.right();
     }
 
-    protected V remove(K other) {
+    protected void remove(K other) {
       // get the parent of and the node such that node.key == key
       BSTNode<K,V> parent = parentOf(other);
-      if (parent == null) return null;
+      if (parent == null) return;
       boolean isChildLeftTree = parent.left() != null && parent.left().getKey() == key;
       BSTNode<K,V> node = isChildLeftTree ? parent.left() : parent.right();
-      V v = node.getValue();
 
       if (node.right() != null && node.left() != null) {
         BSTNode<K,V> substitute = node.left().greater();
@@ -114,8 +113,6 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
         if (isChildLeftTree) parent.setLeft(node.right());
         else parent.setRight(node.right());
       }
-
-      return v;
     }
 
     protected BSTNode<K,V> parentOf(K other) {
@@ -220,8 +217,8 @@ public class BST <K extends Comparable<? super K>, V> implements Tree<K, V> {
     root.add(key, val);
   }
 
-  public V remove(K key) {
-    return root.remove(key);
+  public void remove(K key) {
+    root.remove(key);
   }
 
   public boolean contains(K key) {

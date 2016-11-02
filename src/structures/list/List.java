@@ -1,6 +1,5 @@
 package structures.list;
 
-// TODO: make iterable
 public interface List<T> extends Iterable<T> {
   public boolean empty();
   public int size();

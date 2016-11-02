@@ -107,7 +107,6 @@ public class LinkedList <T> implements List<T> {
     private SingleLinkedNode<T> previousNode;
 		protected SingleLinkedNode<T> nextNode;
 
-    // TODO: inherit javadoc
 		public boolean hasNext() {
 			return this.nextNode.next() != null;
 		}

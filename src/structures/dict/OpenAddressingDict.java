@@ -193,8 +193,6 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
           return this;
         }
 
-        // TODO: incializar con indice
-
         public V next() {
           while (this.hasNext()) {
             if (table[nextIndex++] != null) {

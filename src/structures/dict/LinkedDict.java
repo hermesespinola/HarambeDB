@@ -86,7 +86,6 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
    * @param  k  The key to remove
    * @return      The value mapped to the key provided, null if the key is not in the table
   */
-  //TODO: add change this method in DataStructures project (and the bst corrections)
   public Val remove(Key k) {
     checkKey(k);
     DictNode<Key,Val> x = table[hash(k)];
@@ -111,7 +110,6 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
    * erases the contents of the table
   */
   public void clear() {
-    // borra todo al chile
     for (DictNode<Key, Val> root : table) {
       root = null;
     }

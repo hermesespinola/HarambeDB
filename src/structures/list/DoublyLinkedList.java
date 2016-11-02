@@ -74,7 +74,6 @@ public class DoublyLinkedList<T> implements List<T>  {
     this.size++;
   }
 
-  // TODO: implement!!!
   public int indexOf(T x) {
     DoublyLinkedNode<T> currentNode = this.first;
     int i = 0;

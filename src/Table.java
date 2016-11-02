@@ -63,13 +63,11 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     // FIXME: only works if table is LinkedDict.
     ArrayList<PrimaryKey> tableKeys = (ArrayList<PrimaryKey>) table.keys();
     Collections.sort(tableKeys);
-    System.out.println(tableKeys);
     // create a new partition ...
     Dict<PrimaryKey, Dict<String, Object>> newTableSegment = new LinkedDict<>();
     // move half of the current partition to the new partition...
     for (int i = tableKeys.size()/2; i < tableKeys.size(); i++) {
       newTableSegment.add(tableKeys.get(i), table.getValue(tableKeys.get(i)));
-      table.remove(tableKeys.get(i));
     }
     createNewPartition(newTableSegment, tableKeys.get(0));
   }
@@ -77,7 +75,6 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   public Table<PrimaryKey> addRow(PrimaryKey key) {
     if (currentPartitionLesserKey == null) {
       currentPartitionLesserKey = key;
-      System.out.println(tablePartitions.isEmpty());
       if (tablePartitions.isEmpty()) {
         tablePartitions.add(key, currentPartitionPath);
       }
@@ -92,9 +89,9 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     loadPartition(key);
     if (table.getSize() == THRESHOLD) {
       rebalancePartitions();
+      loadPartition(key);
     }
     table.add(key, new LinkedDict<String, Object>());
-
     return this;
   }
 
@@ -231,7 +228,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
     users.addRow("Manolo");
     users.addRow("Lucio");
+    users.addRow("Teletubi");
+    users.addRow("Miguel");
     users.addRow("Miguelito");
-    users.rebalancePartitions();
+    users.addRow("Chuck");
+    // System.out.println(users.table.keys());
   }
 }

@@ -133,7 +133,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   // saves segment to file and add it to the segments tree.
   private final void createNewPartition(Dict<PrimaryKey, Dict<String, Object>> segment, PrimaryKey lesserKey) {
-    String path = "../" + tableName + '/' + tableName + partitionCount + ".hseg";
+    String path = "../" + tableName + '/' + tableName + partitionCount + ".hbsg";
     try (ObjectOutputStream oos = new ObjectOutputStream(
     new FileOutputStream(path))) {
       oos.writeObject(segment);
@@ -152,7 +152,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     }
     if (currentPartitionPath == null) {
       // file is not in the avl tree and there is no file for this segment
-      currentPartitionPath = "../" + tableName + '/' + tableName + partitionCount + ".hseg";
+      currentPartitionPath = "../" + tableName + '/' + tableName + partitionCount + ".hbsg";
       try (ObjectOutputStream oos = new ObjectOutputStream(
       new FileOutputStream(currentPartitionPath))) {
         oos.writeObject(table);

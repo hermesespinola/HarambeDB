@@ -63,30 +63,33 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   // cut lesser values of current table and paste it in the next table with lesserKey (left child)
   private final void rebalancePartitions() {
     // FIXME: only works if table is LinkedDict (modify OpenAddressingDict).
-    ArrayList<PrimaryKey> tableKeys = (ArrayList<PrimaryKey>) table.keys();
+    ArrayList<PrimaryKey> tableKeys = (ArrayList<PrimaryKey>) table.keys(); // TODO: Partition.getPrimaryKeys();
     Collections.sort(tableKeys);
     // create a new partition ...
-    Dict<PrimaryKey, Dict<String, Object>> newPartition = new LinkedDict<>();
+    Dict<PrimaryKey, Dict<String, Object>> newPartition = new LinkedDict<>(); // TODO: Partition
     // move half of the current partition to the new partition...
     for (int i = tableKeys.size()/2; i < tableKeys.size(); i++) {
-      newPartition.add(tableKeys.get(i), table.getValue(tableKeys.get(i)));
-      table.remove(tableKeys.get(i));
+      newPartition.add(tableKeys.get(i), table.getValue(tableKeys.get(i))); // TODO: Partition.addRow
+      table.remove(tableKeys.get(i)); // TODO: Partition.removeRow
     }
-    createNewPartition(newPartition, tableKeys.get(tableKeys.size()/2));
+    createNewPartition(newPartition, tableKeys.get(tableKeys.size()/2)); // TODO new Partition
   }
 
+  // TODO: Partition.removeRow
   public Table<PrimaryKey> removeRow(PrimaryKey key) {
     loadPartition(key);
-    table.remove(key);
+    table.remove(key); // TODO: Partition.removeRow;
     return this;
   }
 
+  // TODO: Row.add
   public Table<PrimaryKey> removeCell(PrimaryKey key, String column) throws Exception {
     Dict<String, Object> row = getRow(key);
     row.remove(column);
     return this;
   }
 
+  // TODO: Partition.addRow;
   public Table<PrimaryKey> addRow(PrimaryKey key) {
     if (tablePartitions.isEmpty()) {
       currentPartitionLesserKey = key;
@@ -98,14 +101,15 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       currentPartitionLesserKey = key;
     }
 
-    loadPartition(key);
-    table.add(key, new LinkedDict<String, Object>());
+    loadPartition(key); // TODO: Partition.load
+    table.add(key, new LinkedDict<String, Object>()); // TODO: Partition.addRow;
     if (table.getSize() > THRESHOLD) {
       rebalancePartitions();
     }
     return this;
   }
 
+  // TODO: Partition.getRow;
   public Dict<String, Object> getRow(PrimaryKey key) throws Exception {
     loadPartition(key);
     Dict<String, Object> row = table.getValue(key);
@@ -260,9 +264,6 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     System.out.println(users.getRow("Manolo"));
 
     users.removeCell("Lucio", "Address");
-    System.out.println(users.getRow("Lucio"));
-    System.out.println(users.getCell("Lucio", "Address"));
-    users.removeRow("Lucio");
     System.out.println(users.getRow("Lucio"));
   }
 }

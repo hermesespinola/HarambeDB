@@ -1,5 +1,8 @@
+package database;
+
 import structures.dict.Dict;
 import structures.dict.LinkedDict;
+import structures.list.DoublyLinkedList;
 import structures.tree.AVL;
 import structures.node.KeyValueNode;
 import java.util.ArrayList;
@@ -24,6 +27,8 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private int partitionCount;
   // dictionary of columns and their data types
   private Dict<String, Class<?>> columns;
+  // list of sorted keys
+  private DoublyLinkedList<PrimaryKey> sortedKeys;
   // partition of the table, dictionary of rows
   private transient Dict<PrimaryKey, Dict<String, Object>> table;
   // maximum number of entries before partitioning the table
@@ -87,6 +92,40 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     Dict<String, Object> row = getRow(key);
     row.remove(column);
     return this;
+  }
+
+  // adds a key to the sortedKeys list
+  private void addSortedKey(PrimaryKey key) {
+    if (this.sortedKeys.size() == 0) {
+      this.sortedKeys.add(0, key);
+    }
+
+    int lower = 0;
+    int upper = this.sortedKeys.size() - 1;
+    int mid;
+
+    if (key.compareTo(this.sortedKeys.get(0)) < 0) {
+      this.sortedKeys.add(0, key);
+      return;
+    }
+    else if(key.compareTo(this.sortedKeys.get(this.sortedKeys.size() - 1)) > 0) {
+      this.sortedKeys.add(this.sortedKeys.size() - 1, key);
+      return;
+    }
+
+    while (true) {
+      mid = lower + (upper - lower) / 2;
+      if (lower + 1 == upper) {
+        this.sortedKeys.add(lower, key);
+        return;
+      }
+      if (key.compareTo(this.sortedKeys.get(mid)) > 0) {
+        lower = mid;
+      }
+      else if (key.compareTo(this.sortedKeys.get(mid)) < 0) {
+        upper = mid;
+      }
+    }
   }
 
   // TODO: Partition.addRow;

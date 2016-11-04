@@ -1,4 +1,4 @@
-package database;
+package database.table;
 
 import structures.dict.Dict;
 import structures.dict.LinkedDict;

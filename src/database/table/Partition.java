@@ -1,13 +1,14 @@
-package database;
+package database.table;
 
 import java.util.List;
 import java.io.ObjectInputStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import database.row.Row;
 
 // create the partition file when <init>
-interface Partition<PrimaryKey> {
+public interface Partition<PrimaryKey> {
   int partitionNumber = 0; // An id for the partition
   public static final String extension = ".hbpt";
 

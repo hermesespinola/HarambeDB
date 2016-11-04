@@ -11,9 +11,11 @@ import java.util.Collections;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import database.table.Table;
 
 @SuppressWarnings("rawtypes")
 public class DataBase implements Serializable {
+  private static final long serialVersionUID = 14L;
   protected LinkedDict<String, Table<?>> tables;
   // protected DirectedGraph<Column> relationships;
   protected String name;

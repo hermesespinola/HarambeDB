@@ -1,6 +1,8 @@
-package database;
+package database.row;
 
 import java.util.List;
+import database.column.ColumnList;
+import database.column.Column;
 
 public interface Row {
   ColumnList columns = null;

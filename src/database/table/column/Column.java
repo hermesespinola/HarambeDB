@@ -1,4 +1,4 @@
-package database;
+package database.column;
 
 public class Column {
   int index;

@@ -17,24 +17,33 @@ import java.util.Collections;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import database.column.ColumnList;
 
 public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
   // avl tree containing the location and first value of the diferent partitions of the table
   private AVL<PrimaryKey, String> tablePartitions;
+
   // name of the table
   private String tableName;
+
   // number of partitions
   private int partitionCount;
+
   // dictionary of columns and their data types
-  private Dict<String, Class<?>> columns;
+  private Dict<String, Class<?>> cols;
+  private ColumnList columns; // !!!
+
   // list of sorted keys
-  private DoublyLinkedList<PrimaryKey> sortedKeys;
+  private DoublyLinkedList<PrimaryKey> sortedKeys; // TODO: Move to partition class
+
   // partition of the table, dictionary of rows
-  private transient Dict<PrimaryKey, Dict<String, Object>> table;
+  private transient Dict<PrimaryKey, Dict<String, Object>> table; // TODO: remove this
+  private transient Partition<PrimaryKey> currentPartition;
+  private transient String currentPartitionPath; // TODO: remove this
+  private transient PrimaryKey currentPartitionLesserKey; // TODO: remove this
+
   // maximum number of entries before partitioning the table
   private transient static final int THRESHOLD = 1;
-  private transient String currentPartitionPath;
-  private transient PrimaryKey currentPartitionLesserKey;
   private static final long serialVersionUID = 05L;
   public transient static final String extension = ".hbtb";
 

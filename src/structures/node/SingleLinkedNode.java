@@ -1,8 +1,10 @@
 package structures.node;
 
-public class SingleLinkedNode<V> extends Node<V> {
+import java.io.Serializable;
+
+public class SingleLinkedNode<V> extends Node<V> implements Serializable {
   SingleLinkedNode<V> next;
-  private static final long serialVersionUID = 13l;
+  private static final long serialVersionUID = 16L;
 
   public SingleLinkedNode(V val) {
     super(val);

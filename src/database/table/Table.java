@@ -17,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 
+// TODO: check partitions avl when removing a row
 public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
   // avl tree containing the location and first value of the diferent partitions of the table
   private AVL<PrimaryKey, Integer> partitions;
@@ -34,18 +35,20 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private transient Partition<PrimaryKey> currentPartition;
 
   // maximum number of entries before partitioning the table
-  private transient static final int THRESHOLD = 1;
+  private transient static final int THRESHOLD = 50;
   private static final long serialVersionUID = 05L;
   public transient static final String extension = ".hbtb";
+  String tableName;
 
-  public Table(String tableName) throws HarambException {
-    // TODO: change to some other directory
-    File tableDir = new File("../" + tableName);
+  public Table(String dbPath, String tableName) throws HarambException {
+    this.path = dbPath + tableName + '/';
+    this.tableName = tableName;
+    File tableDir = new File(this.path);
     if (!tableDir.exists()) {
       try {
         tableDir.mkdir();
         ObjectOutputStream oos = new ObjectOutputStream(
-          new FileOutputStream("../" + tableName + '/' + tableName + extension));
+          new FileOutputStream(this.path + tableName + extension));
         oos.writeObject(this);
         oos.close();
       } catch (Exception e) {
@@ -53,9 +56,8 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       }
     } else {
       // TODO: hacer más cosas
-      throw new HarambException("Table " + tableName + " already exists"); // TODO: change to HarambException
+      throw new HarambException("Table " + tableName + " already exists");
     }
-    this.path = "../" + tableName + '/';
     partitions = new AVL<>();
     currentPartition = new HarambePartition<PrimaryKey>(this.path, partitionCount);
     this.columns = new HarambeColumnList();
@@ -106,6 +108,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   public Row getRow(PrimaryKey key) throws HarambException {
     loadPartition(key);
+    System.out.println(currentPartition.rows());
     Row row = currentPartition.getRow(key);
     if (row == null) {
       throw new HarambException("No such row: " + key);
@@ -115,8 +118,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   private final void loadPartition(PrimaryKey keyInRange) throws HarambException {
     KeyValueNode<PrimaryKey,Integer> partitionInfo = partitions.getClosest(keyInRange);
-    if (partitionInfo.getKey().compareTo(currentPartition.getKeys().get(0)) != 0) {
-      currentPartition.save();
+    if (currentPartition == null) {
+      currentPartition = Partition.load(this.path, partitionInfo.getValue());
+    } else if (partitionInfo.getKey().compareTo(currentPartition.getKeys().get(0)) != 0) {
+      currentPartition.save(); // TODO: save only if data changed
       currentPartition = Partition.load(this.path, partitionInfo.getValue());
     }
   }
@@ -125,15 +130,24 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return this.columns.get(columnName);
   }
 
+  public void save() throws HarambException {
+    currentPartition.save();
+    try (ObjectOutputStream oos = new ObjectOutputStream(
+    new FileOutputStream(this.path + tableName + extension))) {
+      oos.writeObject(this);
+    } catch (Exception e) {
+      throw new HarambException(e);
+    }
+  }
+
   @SuppressWarnings("unchecked")
-  public static final <T extends Comparable<? super T>> Table<T> load(String tableName) {
+  public static final <T extends Comparable<? super T>> Table<T> load(final String dbPath, final String tableName) throws HarambException {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-      new FileInputStream("../" + tableName + '/' + tableName + extension)))) {
+      new FileInputStream(dbPath + tableName + extension)))) {
         return (Table<T>) ois.readObject();
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new HarambException(e);
     }
-    return null;
   }
   //
   // public static final void showMenu() {
@@ -144,30 +158,4 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   //   System.out.println("5) Add row");
   //   System.out.print(": ");
   // }
-
-
-  public static void main(String[] args) throws Exception {
-
-    // Table<String> users = Table.load("Users");
-    Table<String> users = new Table<String>("Users");
-
-    users.addColumn("Address", String.class);
-    users.addColumn("Age", Integer.class);
-
-    users.addRow("Chuck Norris");
-    users.getRow("Chuck Norris").set(users.getColumn("Address"), "Dirección de Chuck")
-    .set(users.getColumn("Age"), 1001);
-
-    users.addRow("Lucio");
-    users.getRow("Lucio").set(users.getColumn("Address"), "Dirección de Lucio")
-      .set(users.getColumn("Age"), 19);
-
-    users.addRow("Manolo");
-    users.getRow("Manolo").set(users.getColumn("Address"), "Dirección de manolo");
-    users.getRow("Manolo").set(users.getColumn("Age"), 123);
-
-    System.out.println(users.getRow("Chuck Norris"));
-    System.out.println(users.getRow("Lucio"));
-    System.out.println(users.getRow("Manolo"));
-  }
 }

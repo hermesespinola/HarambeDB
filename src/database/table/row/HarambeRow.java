@@ -2,6 +2,7 @@ package database.table.row;
 
 import structures.list.ArrayLinearList;
 import database.table.column.*;
+import database.HarambException;
 
 public class HarambeRow implements Row {
   private ArrayLinearList<Object> row;
@@ -11,14 +12,13 @@ public class HarambeRow implements Row {
     row = new ArrayLinearList<>(list.size());
   }
 
-  public <T> HarambeRow set(Column col, T element) throws Exception { // TODO: change to HarambException
-    // TODO: test this.
+  public <T> HarambeRow set(Column col, T element) throws HarambException {
     while (col.index() > row.size()) {
       row.add(null);
     }
 
     if ( col.type() != element.getClass() ) {
-      throw new Exception("Element does not agree with column data type");
+      throw new HarambException("Element's type of '" + element + "' does not agree with column data type:" + col.type());
     }
 
     row.add(col.index(), element);

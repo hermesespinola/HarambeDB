@@ -6,6 +6,7 @@ import java.util.ListIterator;
 public class LinkedList <T> implements List<T> {
   SingleLinkedNode<T> _firstNode;
   int _size;
+  private static final long serialVersionUID = 22l;
 
   public LinkedList() {
     this._size = 0;

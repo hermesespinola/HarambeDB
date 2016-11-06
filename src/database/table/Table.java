@@ -5,6 +5,7 @@ import structures.dict.LinkedDict;
 import structures.list.List;
 import structures.tree.AVL;
 import structures.node.KeyValueNode;
+import database.HarambException;
 import database.table.column.*;
 import database.table.row.*;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
   // avl tree containing the location and first value of the diferent partitions of the table
@@ -38,7 +38,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private static final long serialVersionUID = 05L;
   public transient static final String extension = ".hbtb";
 
-  public Table(String tableName) throws IOException {
+  public Table(String tableName) throws HarambException {
     // TODO: change to some other directory
     File tableDir = new File("../" + tableName);
     if (!tableDir.exists()) {
@@ -48,12 +48,12 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
           new FileOutputStream("../" + tableName + '/' + tableName + extension));
         oos.writeObject(this);
         oos.close();
-      } catch (SecurityException se) {
-        se.printStackTrace();
+      } catch (Exception e) {
+        throw new HarambException(e);
       }
     } else {
       // TODO: hacer más cosas
-      throw new IOException("Table already exists"); // TODO: change to HarambException
+      throw new HarambException("Table " + tableName + " already exists"); // TODO: change to HarambException
     }
     this.path = "../" + tableName + '/';
     partitions = new AVL<>();
@@ -67,7 +67,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   }
 
   // cut lesser values of current table and paste it in the next table with lesserKey (left child)
-  private void dividePartition() throws IOException {
+  private void dividePartition() throws HarambException {
     List<PrimaryKey> keys = currentPartition.getKeys();
     Partition<PrimaryKey> newPartition = new HarambePartition<>(this.path, partitionCount);
 
@@ -80,12 +80,12 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     newPartition.save();
   }
 
-  public void removeRow(PrimaryKey key) {
+  public void removeRow(PrimaryKey key) throws HarambException {
     loadPartition(key);
     currentPartition.removeRow(key);
   }
 
-  public void addRow(PrimaryKey key) throws IOException {
+  public void addRow(PrimaryKey key) throws HarambException {
     if (partitions.isEmpty()) {
       partitions.add(key, partitionCount++);
       currentPartition.addRow(key, new HarambeRow(this.columns));
@@ -104,23 +104,19 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     }
   }
 
-  public Row getRow(PrimaryKey key) throws Exception {
+  public Row getRow(PrimaryKey key) throws HarambException {
     loadPartition(key);
     Row row = currentPartition.getRow(key);
     if (row == null) {
-      throw new Exception("No such row: " + key);
+      throw new HarambException("No such row: " + key);
     }
     return row;
   }
 
-  private final void loadPartition(PrimaryKey keyInRange) {
+  private final void loadPartition(PrimaryKey keyInRange) throws HarambException {
     KeyValueNode<PrimaryKey,Integer> partitionInfo = partitions.getClosest(keyInRange);
     if (partitionInfo.getKey().compareTo(currentPartition.getKeys().get(0)) != 0) {
-      try {
-        currentPartition.save();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      currentPartition.save();
       currentPartition = Partition.load(this.path, partitionInfo.getValue());
     }
   }

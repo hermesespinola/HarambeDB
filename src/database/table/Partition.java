@@ -1,5 +1,6 @@
 package database.table;
 
+import database.HarambException;
 import structures.list.List;
 import structures.dict.Dict;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public interface Partition<PrimaryKey extends Comparable<? super PrimaryKey>> {
     return null;
   };
   // save the partition in a .hbpt file
-  public void save() throws IOException; // same as Table's saveCurrentPartition and savePartition
+  public void save() throws HarambException; // same as Table's saveCurrentPartition and savePartition
   public String path(); // return the path to the partition file
   public List<PrimaryKey> getKeys();
   public void addRow(PrimaryKey key, Row row);

@@ -5,6 +5,7 @@ import structures.list.DoublyLinkedList;
 import structures.dict.Dict;
 import structures.dict.LinkedDict;
 import database.table.row.Row;
+import database.HarambException;
 import java.io.Serializable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -77,12 +78,12 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
   }
 
   // save the partition in a .hbpt file
-  public void save() throws IOException {
+  public void save() throws HarambException {
     try (ObjectOutputStream oos = new ObjectOutputStream(
     new FileOutputStream(this.path))) {
       oos.writeObject(this);
     } catch (Exception e) {
-      throw new IOException(e);
+      throw new HarambException(e);
     }
   }
 

@@ -2,7 +2,7 @@ package database.table.relationship;
 
 import database.table.Table;
 import database.table.Row;
-import structures.list.ArrayList;
+import structures.list.ArrayLinearList;
 
 public class Relationship<T> {
   protected Table<?> originTable;
@@ -17,7 +17,7 @@ public class Relationship<T> {
     }
   }
 
-  public ArrayList<Row> getRows() {
+  public ArrayLinearList<Row> getRows() {
     if (!this.isMultiple) {
       throw new HarambException("Relationship is one to one. Use getRow() instead.");
     }

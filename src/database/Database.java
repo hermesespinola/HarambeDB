@@ -2,6 +2,7 @@ package database;
 
 import structures.dict.Dict;
 import structures.dict.LinkedDict;
+import structures.list.ArrayLinearList;
 import java.util.Comparator;
 import java.nio.file.Paths;
 import java.nio.file.Files;
@@ -18,11 +19,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import database.table.Table;
+import database.table.relationship.Relationship;
 
 @SuppressWarnings("rawtypes")
 public class Database implements Serializable {
   private static final long serialVersionUID = 14L;
   public transient static final String extension = ".hbdb";
+  public transient ArrayLinearList<Table<?>> tables;
+  public Dict<String, Integer> tableMap; // tableName -> table index in tables
 
   // protected DirectedGraph<Column> relationships;
   protected final String path;
@@ -66,11 +70,19 @@ public class Database implements Serializable {
   public static final Database load(final String dbName) throws HarambException {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
       new FileInputStream("../" + dbName + '/' + dbName + extension)))) {
-        return (Database) ois.readObject();
+        Database db = (Database) ois.readObject();
+        for (String tableName : db.tableMap.keys()) {
+          db.tables = new ArrayLinearList<Table<?>>(db.tableMap.getSize());
+          db.tables.set(db.tableMap.getValue(tableName), new Table<String>("asd", ""));
+        }
+        return db;
     } catch (Exception e) {
       throw new HarambException(e);
     }
   }
+
+  // public static final Relationship oneToOneRelationship(Table<?> origin, Table<?> destiny, Column originField) {
+  // }
 
   public static void main(String[] args) throws Exception {
     Database db = Database.load("Expenses");

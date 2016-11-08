@@ -1,6 +1,8 @@
 package structures.list;
 
-public interface List<T> extends Iterable<T> {
+import java.io.Serializable;
+
+public interface List<T> extends Iterable<T>, Serializable {
   public boolean empty();
   public int size();
   public T get(int index);

@@ -3,11 +3,13 @@ package structures.list;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import structures.node.DoublyLinkedNode;
+import java.io.Serializable;
 
-public class DoublyLinkedList<T> implements List<T>  {
+public class DoublyLinkedList<T> implements List<T>, Serializable {
   int size;
   DoublyLinkedNode<T> first;
   DoublyLinkedNode<T> last;
+  private static final long serialVersionUID = 18L;
 
   public DoublyLinkedList() {
     this.first = null;
@@ -100,12 +102,12 @@ public class DoublyLinkedList<T> implements List<T>  {
   }
 
   public void add(int index, T element) {
+    checkIndex(index);
     if (index == 0) {
       addFirst(element);
     } else if (index == this.size) {
       addLast(element);
     } else {
-      checkIndex(index);
       DoublyLinkedNode<T> nextNode = getNode(index);
       DoublyLinkedNode<T> newNode = new DoublyLinkedNode<T>(element, nextNode, nextNode.previous());
       nextNode.previous().setNext(newNode);

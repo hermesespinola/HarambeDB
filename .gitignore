@@ -1,7 +1,7 @@
 *.class
 *.hbdb
 *.hbtb
-*.hbsg
+*.hbpt
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

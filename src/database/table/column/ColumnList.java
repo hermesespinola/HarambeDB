@@ -1,8 +1,11 @@
-package database.column;
+package database.table.column;
 
 import structures.dict.LinkedDict;
+import java.io.Serializable;
 
-public interface ColumnList {
-  LinkedDict<String, Column> columns = null; // Name -> index
-  public <T> T cast();
+public interface ColumnList extends Serializable {
+  public <T> void add(String columnName, Column col);
+  public <T> Column get(String columnName);
+  public int indexOf(String columnName);
+  public int size();
 }

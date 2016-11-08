@@ -7,6 +7,7 @@ public class ArrayLinearList<T> implements List<T> {
 private T[] arr;
 private int size;
 public static final int DEFAULT_SIZE = 100;
+private static final long serialVersionUID = 20l;
 
 @SuppressWarnings("unchecked")
 public ArrayLinearList(int initialSize) throws IllegalArgumentException {
@@ -51,6 +52,11 @@ public int indexOf(T x) {
                         return i;
         }
         return -1;
+}
+
+public void set(int index, T newE) {
+  if (index < 0 || index >= this.size) throw new IndexOutOfBoundsException();
+  this.arr[index] = newE;
 }
 
 @Override

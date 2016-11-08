@@ -1,5 +1,7 @@
 package structures.node;
 
+import java.io.Serializable;
+
 public class DoublyLinkedNode<V> extends SingleLinkedNode<V> {
   DoublyLinkedNode<V> previous;
   private static final long serialVersionUID = 17L;
@@ -29,6 +31,6 @@ public class DoublyLinkedNode<V> extends SingleLinkedNode<V> {
   }
 
   public void setPrevious(DoublyLinkedNode<V> prev) {
-    this.previous = previous;
+    this.previous = prev;
   }
 }

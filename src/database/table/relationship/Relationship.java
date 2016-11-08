@@ -1,5 +1,25 @@
-package database;
+package database.table.relationship;
 
-interface Relationship<T> {
-  //protected
+import database.table.Table;
+import database.table.Row;
+import structures.list.ArrayList;
+
+public class Relationship<T> {
+  protected Table<?> originTable;
+  protected Table<?> destinyTable;
+  protected String originField;
+  protected String destinyField;
+  protected boolean isMultiple;
+
+  public Row getRow() {
+    if (this.isMultiple) {
+      throw new HarambException("Relationship is one to many. Use getRows() instead.");
+    }
+  }
+
+  public ArrayList<Row> getRows() {
+    if (!this.isMultiple) {
+      throw new HarambException("Relationship is one to one. Use getRow() instead.");
+    }
+  }
 }

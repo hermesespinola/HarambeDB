@@ -10,4 +10,8 @@ public class HarambException extends IOException {
   public HarambException(Exception e) {
     super(e.getMessage());
   }
+
+  public String toString() {
+    return this.getMessage();
+  }
 }

@@ -33,6 +33,8 @@ public class Database implements Serializable {
 
   public Database(String dbName) throws HarambException {
     this.path = "../" + dbName + '/';
+    tableMap = new LinkedDict<>();
+    tables = new ArrayLinearList<>();
 
     File dbDir = new File(this.path);
     if (!dbDir.exists()) {
@@ -52,19 +54,27 @@ public class Database implements Serializable {
   }
 
   public <T extends Comparable<? super T>> Table<T> createTable(String tableName, Class<T> primaryKeyType) throws HarambException {
-    return new Table<T>(this.path, tableName);
+    Table<T> t = new Table<T>(this.path, tableName);
+    tableMap.add(tableName, tables.size());
+    tables.add(t);
+    return t;
   }
 
   @SuppressWarnings("unchecked")
   private <T extends Comparable<? super T>> Table<T> getTable(String tableName) throws HarambException {
-    return (Table<T>) Table.load(this.path + tableName + '/', tableName);
+    return (Table<T>) tables.get(tableMap.getValue(tableName));
   }
 
   public void dropTable(String tableName) throws IOException {
+    // erase table directory recursevely
     Path dirPath = Paths.get( this.path + tableName );
     Files.walk(dirPath).map( Path::toFile )
       .sorted( Comparator.comparing( File::isDirectory ) )
       .forEach( File::delete );
+
+    // remove table from tables and tableMap
+    tables.set(tableMap.getValue(tableName), null);
+    tableMap.remove(tableName);
   }
 
   public static final Database load(final String dbName) throws HarambException {
@@ -73,7 +83,7 @@ public class Database implements Serializable {
         Database db = (Database) ois.readObject();
         for (String tableName : db.tableMap.keys()) {
           db.tables = new ArrayLinearList<Table<?>>(db.tableMap.getSize());
-          db.tables.set(db.tableMap.getValue(tableName), new Table<String>("asd", ""));
+          db.tables.set(db.tableMap.getValue(tableName), Table.load(db.path, tableName));
         }
         return db;
     } catch (Exception e) {
@@ -81,18 +91,25 @@ public class Database implements Serializable {
     }
   }
 
+  public void save() throws HarambException {
+    for (Table<?> table : tables) {
+      table.save();
+    }
+  }
+
   // public static final Relationship oneToOneRelationship(Table<?> origin, Table<?> destiny, Column originField) {
   // }
 
   public static void main(String[] args) throws Exception {
-    Database db = Database.load("Expenses");
+    Database db = new Database("Expenses");
+    // Database db = Database.load("Expenses");
     // db.dropTable("Users");
-    Table<String> users = db.getTable("Users");
-    // Table<String> users = db.createTable("Users", String.class);
-    // users.addColumn("Address", String.class);
-    // users.addRow("Lucio");
-    // users.getRow("Lucio").set(users.getColumn("Address"), "Lucio's Address");
-    // users.save();
+    // Table<String> users = db.getTable("Users");
+    Table<String> users = db.createTable("Users", String.class);
+    users.addColumn("Address", String.class);
+    users.addRow("Lucio");
+    users.getRow("Lucio").set(users.getColumn("Address"), "Lucio's Address");
+    db.save();
     System.out.println(users.getRow("Lucio"));
   }
 }

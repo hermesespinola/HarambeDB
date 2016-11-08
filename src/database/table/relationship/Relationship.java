@@ -22,7 +22,6 @@ public class Relationship<T> {
   public ArrayLinearList<Row> getRows() throws HarambException {
     if (!this.isMultiple) {
       throw new HarambException("Relationship is one to one. Use getRow() instead.");
-      System.out.println("SOY PUTOTE atte. HERMES");
     }
     return null;
   }

@@ -30,9 +30,11 @@ public class Database implements Serializable {
 
   // protected DirectedGraph<Column> relationships;
   protected final String path;
+  protected final String dbName;
 
   public Database(String dbName) throws HarambException {
     this.path = "../" + dbName + '/';
+    this.dbName = dbName;
     tableMap = new LinkedDict<>();
     tables = new ArrayLinearList<>();
 
@@ -81,8 +83,10 @@ public class Database implements Serializable {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
       new FileInputStream("../" + dbName + '/' + dbName + extension)))) {
         Database db = (Database) ois.readObject();
+        db.tables = new ArrayLinearList<Table<?>>(db.tableMap.getSize());
+        System.out.println(db.tableMap);
+        System.out.println(db.tables);
         for (String tableName : db.tableMap.keys()) {
-          db.tables = new ArrayLinearList<Table<?>>(db.tableMap.getSize());
           db.tables.set(db.tableMap.getValue(tableName), Table.load(db.path, tableName));
         }
         return db;
@@ -95,21 +99,31 @@ public class Database implements Serializable {
     for (Table<?> table : tables) {
       table.save();
     }
+
+    try (ObjectOutputStream oos = new ObjectOutputStream(
+      new FileOutputStream(this.path + this.dbName + extension))) {
+      oos.writeObject(this);
+    } catch (Exception e) {
+      throw new HarambException("Could not save database");
+    }
+
   }
 
   // public static final Relationship oneToOneRelationship(Table<?> origin, Table<?> destiny, Column originField) {
   // }
 
   public static void main(String[] args) throws Exception {
-    Database db = new Database("Expenses");
-    // Database db = Database.load("Expenses");
-    // db.dropTable("Users");
-    // Table<String> users = db.getTable("Users");
-    Table<String> users = db.createTable("Users", String.class);
-    users.addColumn("Address", String.class);
-    users.addRow("Lucio");
-    users.getRow("Lucio").set(users.getColumn("Address"), "Lucio's Address");
-    db.save();
+    // Database db = new Database("Expenses");
+    // Table<String> users = db.createTable("Users", String.class);
+    // users.addColumn("Address", String.class);
+    // users.addRow("Lucio");
+    // users.getRow("Lucio").set(users.getColumn("Address"), "Lucio's Address");
+    // db.save();
+
+    Database db = Database.load("Expenses");
+    Table<String> users = db.getTable("Users");
+
+
     System.out.println(users.getRow("Lucio"));
   }
 }

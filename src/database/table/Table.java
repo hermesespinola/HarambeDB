@@ -108,7 +108,6 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   public Row getRow(PrimaryKey key) throws HarambException {
     loadPartition(key);
-    System.out.println(currentPartition.rows());
     Row row = currentPartition.getRow(key);
     if (row == null) {
       throw new HarambException("No such row: " + key);
@@ -143,7 +142,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   @SuppressWarnings("unchecked")
   public static final <T extends Comparable<? super T>> Table<T> load(final String dbPath, final String tableName) throws HarambException {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-      new FileInputStream(dbPath + tableName + extension)))) {
+      new FileInputStream(dbPath + tableName + '/' + tableName + extension)))) {
         return (Table<T>) ois.readObject();
     } catch (Exception e) {
       throw new HarambException(e);

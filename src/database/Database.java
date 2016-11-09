@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import database.table.Table;
-import database.table.relationship.Relationship;
 
 @SuppressWarnings("rawtypes")
 public class Database implements Serializable {
@@ -56,14 +55,14 @@ public class Database implements Serializable {
   }
 
   public <T extends Comparable<? super T>> Table<T> createTable(String tableName, Class<T> primaryKeyType) throws HarambException {
-    Table<T> t = new Table<T>(this.path, tableName);
+    Table<T> t = new Table<T>(this.path, tableName, primaryKeyType);
     tableMap.add(tableName, tables.size());
     tables.add(t);
     return t;
   }
 
   @SuppressWarnings("unchecked")
-  private <T extends Comparable<? super T>> Table<T> getTable(String tableName) throws HarambException {
+  public <T extends Comparable<? super T>> Table<T> getTable(String tableName) throws HarambException {
     return (Table<T>) tables.get(tableMap.getValue(tableName));
   }
 
@@ -83,8 +82,8 @@ public class Database implements Serializable {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
       new FileInputStream("../" + dbName + '/' + dbName + extension)))) {
         Database db = (Database) ois.readObject();
-        db.tables = new ArrayLinearList<Table<?>>(db.tableMap.getSize());
-        System.out.println(db.tableMap);
+        int size = db.tableMap.getSize();
+        db.tables = new ArrayLinearList<Table<?>>(size, size * 2);
         System.out.println(db.tables);
         for (String tableName : db.tableMap.keys()) {
           db.tables.set(db.tableMap.getValue(tableName), Table.load(db.path, tableName));
@@ -106,11 +105,7 @@ public class Database implements Serializable {
     } catch (Exception e) {
       throw new HarambException("Could not save database");
     }
-
   }
-
-  // public static final Relationship oneToOneRelationship(Table<?> origin, Table<?> destiny, Column originField) {
-  // }
 
   public static void main(String[] args) throws Exception {
     // Database db = new Database("Expenses");

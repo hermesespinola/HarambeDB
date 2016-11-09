@@ -3,9 +3,12 @@ package database.table;
 import structures.dict.Dict;
 import structures.dict.LinkedDict;
 import structures.list.List;
+import structures.list.ArrayLinearList;
 import structures.tree.AVL;
 import structures.node.KeyValueNode;
+import database.table.relation.*;
 import database.HarambException;
+import database.Database;
 import database.table.column.*;
 import database.table.row.*;
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   // partition of the table, dictionary of rows
   private transient Partition<PrimaryKey> currentPartition;
+  private final Class<?> primaryKeyType;
 
   // maximum number of entries before partitioning the table
   private transient static final int THRESHOLD = 50;
@@ -40,9 +44,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   public transient static final String extension = ".hbtb";
   String tableName;
 
-  public Table(String dbPath, String tableName) throws HarambException {
+  public Table(String dbPath, String tableName, Class<?> primaryKeyType) throws HarambException {
     this.path = dbPath + tableName + '/';
     this.tableName = tableName;
+    this.primaryKeyType = primaryKeyType;
     File tableDir = new File(this.path);
     if (!tableDir.exists()) {
       try {
@@ -61,6 +66,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     partitions = new AVL<>();
     currentPartition = new HarambePartition<PrimaryKey>(this.path, partitionCount);
     this.columns = new HarambeColumnList();
+  }
+
+  public Class<?> getPrimaryKeyType() {
+    return this.primaryKeyType;
   }
 
   public <ColumnDataType> Table<PrimaryKey> addColumn(String name, Class<ColumnDataType> type) {
@@ -115,6 +124,27 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return row;
   }
 
+  public <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> ArrayLinearList<Row> getRowWithRelation(PrimaryKey key, Database db) throws HarambException {
+    loadPartition(key);
+    ArrayLinearList<Row> rows = new ArrayLinearList<>(5);
+    rows.add(getRow(key));
+    for (Column col : columns) {
+      if (col.hasRelation()) {
+        if (col.relationType() == RelationType.oneToOne) {
+          rows.add(col.getRelatedTable(db).getRow(rows.get(0).get(col)));
+        } else {
+          // if col.type() == RelationType.oneToMany it is guaranteed that every field in the column holds an array.
+          Table<OtherPrimaryKey> related = col.getRelatedTable(db);
+          OtherPrimaryKey[] keys = rows.get(0).get(col);
+          for (OtherPrimaryKey r : keys) {
+            rows.add(related.getRow(r));
+          }
+        }
+      }
+    }
+    return rows;
+  }
+
   private final void loadPartition(PrimaryKey keyInRange) throws HarambException {
     KeyValueNode<PrimaryKey,Integer> partitionInfo = partitions.getClosest(keyInRange);
     if (currentPartition == null) {
@@ -137,6 +167,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     } catch (Exception e) {
       throw new HarambException(e);
     }
+  }
+
+  public String name() {
+    return this.tableName;
   }
 
   @SuppressWarnings("unchecked")

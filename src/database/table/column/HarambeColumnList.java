@@ -1,10 +1,12 @@
 package database.table.column;
 
 import structures.dict.LinkedDict;
+import java.util.Iterator;
 import java.io.Serializable;
 
 public class HarambeColumnList implements ColumnList {
   LinkedDict<String, Column> columns = new LinkedDict<>(); // Name -> index
+  protected boolean hasRelation;
   private static final long serialVersionUID = 19L;
 
   public int indexOf(String columnName) {
@@ -26,5 +28,9 @@ public class HarambeColumnList implements ColumnList {
 
   public String toString() {
     return columns.keys().toString();
+  }
+
+  public Iterator<Column> iterator() {
+    return columns.values().iterator();
   }
 }

@@ -18,7 +18,7 @@ public ArrayLinearList(int initialCapacity) throws IllegalArgumentException {
         this.size = 0;
 }
 
-public ArrayLinearList(int initialCapacity, int size) throws IllegalArgumentException {
+public ArrayLinearList(int size, int initialCapacity) throws IllegalArgumentException {
         if (initialCapacity < 1) {
                 throw new IllegalArgumentException();
         }

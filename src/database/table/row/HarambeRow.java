@@ -3,6 +3,7 @@ package database.table.row;
 import structures.list.ArrayLinearList;
 import database.table.column.*;
 import database.HarambException;
+import java.util.Iterator;
 
 public class HarambeRow implements Row {
   private ArrayLinearList<Object> row;
@@ -36,6 +37,10 @@ public class HarambeRow implements Row {
   @SuppressWarnings("unchecked")
   public <T> T get(Column column) {
     return (T) row.get(column.index());
+  }
+
+  public Iterator<Object> iterator() {
+    return row.iterator();
   }
 
   public String toString() {

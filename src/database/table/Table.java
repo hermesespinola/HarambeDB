@@ -72,9 +72,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return this.primaryKeyType;
   }
 
-  public <ColumnDataType> Table<PrimaryKey> addColumn(String name, Class<ColumnDataType> type) {
-    columns.add(name, new Column(columns.size(), type));
-    return this;
+  public Column addColumn(String name, Class<?> type) {
+    Column newCol = new Column(columns.size(), type);
+    columns.add(name, newCol);
+    return newCol;
   }
 
   // cut lesser values of current table and paste it in the next table with lesserKey (left child)
@@ -96,11 +97,12 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     currentPartition.removeRow(key);
   }
 
-  public void addRow(PrimaryKey key) throws HarambException {
+  // returns the added row
+  public Row addRow(PrimaryKey key) throws HarambException {
     if (partitions.isEmpty()) {
       partitions.add(key, partitionCount++);
       currentPartition.addRow(key, new HarambeRow(this.columns));
-      return;
+      return currentPartition.getRow(key);
     }
 
     loadPartition(key);
@@ -113,6 +115,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     if (currentPartition.size() > THRESHOLD) {
       dividePartition();
     }
+    return this.getRow(key);
   }
 
   public Row getRow(PrimaryKey key) throws HarambException {
@@ -124,6 +127,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return row;
   }
 
+  // TODO: crete relationTuple class.
   public <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> ArrayLinearList<Row> getRowWithRelation(PrimaryKey key, Database db) throws HarambException {
     loadPartition(key);
     ArrayLinearList<Row> rows = new ArrayLinearList<>(5);
@@ -177,7 +181,9 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   public static final <T extends Comparable<? super T>> Table<T> load(final String dbPath, final String tableName) throws HarambException {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
       new FileInputStream(dbPath + tableName + '/' + tableName + extension)))) {
-        return (Table<T>) ois.readObject();
+        Table<T> table = (Table<T>) ois.readObject();
+        table.currentPartition = Partition.load(table.path, 0);
+        return table;
     } catch (Exception e) {
       throw new HarambException(e);
     }

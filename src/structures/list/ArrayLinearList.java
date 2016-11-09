@@ -190,7 +190,7 @@ class IteratorArray implements ListIterator<T> {
         public T next() {
                 if (this.hasNext()) {
                         this.nextIndex++;
-                        this.next = arr[nextIndex];
+                        this.next = (nextIndex < arr.length) ? arr[nextIndex] : null;
                         return arr[nextIndex-1];
                 }
                 else throw new NoSuchElementException();

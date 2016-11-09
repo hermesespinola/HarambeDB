@@ -3,22 +3,29 @@ package structures.list;
 import java.util.NoSuchElementException;
 import java.util.ListIterator;
 
+@SuppressWarnings("unchecked")
 public class ArrayLinearList<T> implements List<T> {
 private T[] arr;
 private int size;
 public static final int DEFAULT_SIZE = 100;
 private static final long serialVersionUID = 20l;
 
-@SuppressWarnings("unchecked")
-public ArrayLinearList(int initialSize) throws IllegalArgumentException {
-        if (initialSize < 1) {
+public ArrayLinearList(int initialCapacity) throws IllegalArgumentException {
+        if (initialCapacity < 1) {
                 throw new IllegalArgumentException();
         }
-        this.arr = (T[]) new Object[initialSize];
+        this.arr = (T[]) new Object[initialCapacity];
         this.size = 0;
 }
 
-@SuppressWarnings("unchecked")
+public ArrayLinearList(int initialCapacity, int size) throws IllegalArgumentException {
+        if (initialCapacity < 1) {
+                throw new IllegalArgumentException();
+        }
+        this.arr = (T[]) new Object[initialCapacity];
+        this.size = size;
+}
+
 public ArrayLinearList(T[] _arr) {
         this.arr = (T[]) new Object[DEFAULT_SIZE];
         System.arraycopy(_arr, 0, this.arr, 0, _arr.length);
@@ -70,8 +77,6 @@ public T remove(int index) throws IndexOutOfBoundsException {
         return r;
 };
 
-
-@SuppressWarnings("unchecked")
 private void resize() {
         T[] newArr = (T[]) new Object[this.size * 2];
         System.arraycopy(this.arr, 0, newArr, 0, this.arr.length);

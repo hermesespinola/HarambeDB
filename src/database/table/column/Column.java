@@ -48,7 +48,8 @@ public class Column implements Serializable {
   }
 
   public <PK extends Comparable<? super PK>> Table<PK> getRelatedTable(Database db) throws HarambException {
-    return db.getTable(this.relation.tableName());
+    Table<PK> t = db.getTable(this.relation.tableName(), this.relation.otherPrimaryKeyType());
+    return t;
   }
 
   public void createRelation(Table<?> to, RelationType type) throws HarambException {

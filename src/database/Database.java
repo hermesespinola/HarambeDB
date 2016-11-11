@@ -73,8 +73,12 @@ public class Database implements Serializable {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Comparable<? super T>> Table<T> getTable(String tableName) throws HarambException {
-    return (Table<T>) tables.get(tableMap.getValue(tableName));
+  public <T extends Comparable<? super T>> Table<T> getTable(String tableName, Class<?> type) throws HarambException {
+    Table t = tables.get(tableMap.getValue(tableName));
+    if (type != t.getPrimaryKeyType()) {
+      throw new HarambException("Primary key of table " + tableName + " is not of " + type);
+    }
+    return (Table<T>) t;
   }
 
   public void dropTable(String tableName) throws IOException {
@@ -163,17 +167,17 @@ public class Database implements Serializable {
     // db.save();
 
     Database db = Database.load("Expenses");
-
-    // List<Row> invoicesAndItems = invoices.getRowWithRelation(4, db);
-    // for (Row row : invoicesAndItems) {
-    //   for (Object val : row) {
-    //     if (val.getClass().isArray()) {
-    //       System.out.print(Arrays.toString((Object[])val) + " ");
-    //     } else {
-    //       System.out.print(val + " ");
-    //     }
-    //   }
-    //   System.out.println();
-    // }
+    Table<String> users = db.getTable("Users", String.class);
+    List<Row> usersInvoicesItems = users.getRowWithRelations("Hermes", db);
+    for (Row row : usersInvoicesItems) {
+      for (Object val : row) {
+        if (val.getClass().isArray()) {
+          System.out.print(Arrays.toString((Object[])val) + " ");
+        } else {
+          System.out.print(val + " ");
+        }
+      }
+      System.out.println();
+    }
   }
 }

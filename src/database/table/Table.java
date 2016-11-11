@@ -1,5 +1,6 @@
 package database.table;
 
+import java.util.Arrays;
 import structures.dict.Dict;
 import structures.dict.LinkedDict;
 import structures.list.List;
@@ -127,25 +128,28 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return row;
   }
 
-  // TODO: crete relationTuple class.
-  public <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> ArrayLinearList<Row> getRowWithRelation(PrimaryKey key, Database db) throws HarambException {
+  private <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> void getRowWithRelationsUtil(PrimaryKey key, Database db, ArrayLinearList<Row> target) throws HarambException {
     loadPartition(key);
-    ArrayLinearList<Row> rows = new ArrayLinearList<>(5);
-    rows.add(getRow(key));
+    int idx = target.size();  // index of the row of the current table
+    target.add(getRow(key));
     for (Column col : columns) {
       if (col.hasRelation()) {
         if (col.relationType() == RelationType.oneToOne) {
-          rows.add(col.getRelatedTable(db).getRow(rows.get(0).get(col)));
+          col.getRelatedTable(db).getRowWithRelationsUtil(target.get(idx).get(col), db, target);
         } else {
-          // if col.type() == RelationType.oneToMany it is guaranteed that every field in the column holds an array.
           Table<OtherPrimaryKey> related = col.getRelatedTable(db);
-          OtherPrimaryKey[] keys = rows.get(0).get(col);
+          OtherPrimaryKey[] keys = target.get(idx).get(col);
           for (OtherPrimaryKey r : keys) {
-            rows.add(related.getRow(r));
+            related.getRowWithRelationsUtil(r, db, target);
           }
         }
       }
     }
+  }
+
+  public <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> List<Row> getRowWithRelations(PrimaryKey key, Database db) throws HarambException {
+    ArrayLinearList<Row> rows = new ArrayLinearList<>();
+    this.getRowWithRelationsUtil(key, db, rows);
     return rows;
   }
 

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import database.table.Table;
 
-import database.table.relation.RelationType;
+import database.table.relation.Relation;
 import structures.list.List;
 import database.table.row.Row;
 import database.table.column.Column;
@@ -55,7 +55,6 @@ public class Database implements Serializable {
         throw new HarambException(e);
       }
     } else {
-      // TODO: hacer más cosas
       throw new HarambException("Database " + dbName + " already exists");
     }
   }

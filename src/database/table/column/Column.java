@@ -4,7 +4,7 @@ import java.io.Serializable;
 import database.HarambException;
 import database.table.Table;
 import database.Database;
-import database.table.relation.*;
+import database.table.relation.Relation;
 
 public class Column implements Serializable {
   int index;
@@ -33,7 +33,7 @@ public class Column implements Serializable {
     this.relation = null;
   }
 
-  public RelationType relationType() throws HarambException {
+  public Relation.Type relationType() throws HarambException {
     if (!this.hasRelation()) {
       throw new HarambException("Column has no relation");
     }
@@ -52,7 +52,7 @@ public class Column implements Serializable {
     return t;
   }
 
-  public void createRelation(Table<?> to, RelationType type) throws HarambException {
+  public void createRelation(Table<?> to, Relation.Type type) throws HarambException {
     if (hasRelation()) {
       throw new HarambException("Column already has a relation");
     }

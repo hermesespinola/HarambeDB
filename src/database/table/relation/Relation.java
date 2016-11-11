@@ -6,13 +6,19 @@ import database.table.Table;
 import java.io.Serializable;
 
 public class Relation implements Serializable {
-  RelationType type;
+
+  public static enum Type implements Serializable {
+    oneToOne,
+    oneToMany;
+  }
+
+  Type type;
   String tableName;
   Class<?> otherPrimaryKeyType;
   private static final long serialVersionUID = 28l;
 
-  public Relation(Column from, Table<?> to, RelationType type) throws HarambException {
-    if (type == RelationType.oneToMany) {
+  public Relation(Column from, Table<?> to, Type type) throws HarambException {
+    if (type == Type.oneToMany) {
       if (!from.type().isArray()) {
         throw new HarambException("Column data type must be an array to create a one to many relation");
       } else if (!String[].class.getComponentType().isAssignableFrom(String.class)) {
@@ -27,7 +33,7 @@ public class Relation implements Serializable {
     this.otherPrimaryKeyType = to.getPrimaryKeyType();
   }
 
-  public RelationType type() {
+  public Type type() {
     return this.type;
   }
 

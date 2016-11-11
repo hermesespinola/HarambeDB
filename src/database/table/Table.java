@@ -7,7 +7,7 @@ import structures.list.List;
 import structures.list.ArrayLinearList;
 import structures.tree.AVL;
 import structures.node.KeyValueNode;
-import database.table.relation.*;
+import database.table.relation.Relation;
 import database.HarambException;
 import database.Database;
 import database.table.column.*;
@@ -25,6 +25,9 @@ import java.io.FileInputStream;
 public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
   // avl tree containing the location and first value of the diferent partitions of the table
   private AVL<PrimaryKey, Integer> partitions;
+
+  // the name of the primary key column
+  // String pkColName; TODO: add this later
 
   // path to the table file
   private final String path;
@@ -134,7 +137,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     target.add(getRow(key));
     for (Column col : columns) {
       if (col.hasRelation()) {
-        if (col.relationType() == RelationType.oneToOne) {
+        if (col.relationType() == Relation.Type.oneToOne) {
           col.getRelatedTable(db).getRowWithRelationsUtil(target.get(idx).get(col), db, target);
         } else {
           Table<OtherPrimaryKey> related = col.getRelatedTable(db);

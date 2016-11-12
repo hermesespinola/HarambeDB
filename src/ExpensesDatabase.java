@@ -6,13 +6,19 @@ import database.table.column.Column;
 import database.table.relation.Relation;
 import database.table.row.Row;
 
-public class ExpensesDatabase {
-	Database db;
-	Table<String> users;
-	Table<Integer> invoices;
-	Table<String > items;
+public final class ExpensesDatabase {
+	static Database db;
+	static Table<String> users;
+	static Table<Integer> invoices;
+	static Table<String > items;
 
-	private void getDB() throws Exception {
+	// prevent class from being instantiable using reflection.
+	private ExpensesDatabase() {
+		throw new RuntimeException("ExpensesDatabase not instantiable");
+	}
+
+	// initialize database
+	static {
 		try {
 			// create the database
 			db = new Database("Expenses");
@@ -32,20 +38,25 @@ public class ExpensesDatabase {
 			invoiceCol.createRelation(invoices, Relation.Type.oneToMany);
 			itemCol.createRelation(items, Relation.Type.oneToMany);
 		} catch (Exception e) {
-			// maybe the database already exists, try to load it.
-			db = Database.load("Expenses");
-			users = db.getTable("Users", String.class);
-			invoices = db.getTable("Invoices", Integer.class);
-			items = db.getTable("Items", String.class);
+			try {
+				// maybe the database already exists, try to load it.
+				db = Database.load("Expenses");
+				users = db.getTable("Users", String.class);
+				invoices = db.getTable("Invoices", Integer.class);
+				items = db.getTable("Items", String.class);
+			} catch (Exception e2) {
+				e2.printStackTrace();
+				System.exit(-1);
+			}
 		}
 	}
 
-	public void addItem(String itemName, Integer itemExpense) throws Exception {
+	public static void addItem(String itemName, Integer itemExpense) throws Exception {
 		items.addRow(itemName).set(items.getColumn("Expense"), itemExpense);
 	}
 
 	// items must be in Items table
-	public void addInvoice(String userName, Integer invoiceUID, String[] itemsNames) throws Exception {
+	public static void addInvoice(String userName, Integer invoiceUID, String[] itemsNames) throws Exception {
 		Row userRow = users.getRow(userName);
 		if (userRow == null) {
 			throw new RuntimeException("No such user: " + userName);
@@ -65,25 +76,25 @@ public class ExpensesDatabase {
 		userRow.set(users.getColumn("Invoices"), newInvoices);
 	}
 
-	public void addUser(String name, String address, Integer[] invoices) throws Exception {
+	public static void addUser(String name, String address, Integer[] invoices) throws Exception {
 		users.addRow(name).set(users.getColumn("Address"), address).set(users.getColumn("Invoices"), invoices);
 	}
 
-	public void delteUser(String userName, boolean removeInvoices) throws Exception {
+	public static void delteUser(String userName, boolean removeInvoices) throws Exception {
 		if (removeInvoices) {
 			Integer[] uids = users.getRow(userName).get(users.getColumn("Invoices"));
 			for (Integer invoiceId : uids) {
-				this.invoices.removeRow(invoiceId);
+				invoices.removeRow(invoiceId);
 			}
 		}
 		users.removeRow(userName);
 	}
 
-	public void deleteInvoice(Integer invoiceUID) throws Exception {
+	public static void deleteInvoice(Integer invoiceUID) throws Exception {
 		invoices.removeRow(invoiceUID);
 	}
 
-	public void deleteItem(String itemName) throws Exception {
+	public static void deleteItem(String itemName) throws Exception {
 		items.removeRow(itemName);
 	}
 }

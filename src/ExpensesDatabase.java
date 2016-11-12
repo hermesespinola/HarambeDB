@@ -45,7 +45,7 @@ public class ExpensesDatabase {
 	}
 
 	// items must be in Items table
-	public void addInvoice(String userName, Integer uniqueInvoiceNumber, String[] itemsNames) throws Exception {
+	public void addInvoice(String userName, Integer invoiceUID, String[] itemsNames) throws Exception {
 		Row userRow = users.getRow(userName);
 		if (userRow == null) {
 			throw new RuntimeException("No such user: " + userName);
@@ -55,13 +55,13 @@ public class ExpensesDatabase {
 			Integer itemExpense = items.getRow(item).get(items.getColumn("Expense"));
 			total += itemExpense;
 		}
-		invoices.addRow(uniqueInvoiceNumber).set(items.getColumn("Total"), total)
+		invoices.addRow(invoiceUID).set(items.getColumn("Total"), total)
 			.set(items.getColumn("Items"), itemsNames);
 
 		Integer[] currentInvoices = userRow.get(users.getColumn("Invoices"));
 		Integer[] newInvoices = new Integer[currentInvoices.length + 1];
 		System.arraycopy(currentInvoices, 0, newInvoices, 0, currentInvoices.length);
-		newInvoices[currentInvoices.length] = uniqueInvoiceNumber;
+		newInvoices[currentInvoices.length] = invoiceUID;
 		userRow.set(users.getColumn("Invoices"), newInvoices);
 	}
 
@@ -69,7 +69,21 @@ public class ExpensesDatabase {
 		users.addRow(name).set(users.getColumn("Address"), address).set(users.getColumn("Invoices"), invoices);
 	}
 
-	public static void main(String [] args) {
+	public void delteUser(String userName, boolean removeInvoices) throws Exception {
+		if (removeInvoices) {
+			Integer[] uids = users.getRow(userName).get(users.getColumn("Invoices"));
+			for (Integer invoiceId : uids) {
+				this.invoices.removeRow(invoiceId);
+			}
+		}
+		users.removeRow(userName);
+	}
 
+	public void deleteInvoice(Integer invoiceUID) throws Exception {
+		invoices.removeRow(invoiceUID);
+	}
+
+	public void deleteItem(String itemName) throws Exception {
+		items.removeRow(itemName);
 	}
 }

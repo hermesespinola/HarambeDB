@@ -136,6 +136,27 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return row;
   }
 
+  public <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> ArrayLinearList<Row> getRowWithRelation(PrimaryKey key, Database db) throws HarambException {
+    loadPartition(key);
+    ArrayLinearList<Row> rows = new ArrayLinearList<>(20);
+    rows.add(getRow(key));
+    for (Column col : columns) {
+      if (col.hasRelation()) {
+        if (col.relationType() == Relation.Type.oneToOne) {
+          rows.add(col.getRelatedTable(db).getRow(rows.get(0).get(col)));
+        } else {
+          // if col.type() == RelationType.oneToMany it is guaranteed that every field in the column holds an array.
+          Table<OtherPrimaryKey> related = col.getRelatedTable(db);
+          OtherPrimaryKey[] keys = rows.get(0).get(col);
+          for (OtherPrimaryKey r : keys) {
+            rows.add(related.getRow(r));
+          }
+        }
+      }
+    }
+    return rows;
+  }
+
   private <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> void getRowWithRelationsUtil(PrimaryKey key, Database db, ArrayLinearList<Row> target) throws HarambException {
     loadPartition(key);
     int idx = target.size();  // index of the row of the current table

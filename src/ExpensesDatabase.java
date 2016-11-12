@@ -104,7 +104,7 @@ public final class ExpensesDatabase {
 	}
 
 	public static List<Row> getUserAndInvoices(String name) throws Exception {
-		return user.getRowWithRelation(name);
+		return users.getRowWithRelation(name, db);
 	}
 
 	public static List<Row> getUserAndExpenses(String name) throws Exception {

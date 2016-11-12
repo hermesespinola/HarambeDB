@@ -1,10 +1,11 @@
 import java.util.Comparator;
 
 import database.Database;
+import structures.list.List;
 import database.table.Table;
+import database.table.row.Row;
 import database.table.column.Column;
 import database.table.relation.Relation;
-import database.table.row.Row;
 
 public final class ExpensesDatabase {
 	static Database db;
@@ -96,5 +97,29 @@ public final class ExpensesDatabase {
 
 	public static void deleteItem(String itemName) throws Exception {
 		items.removeRow(itemName);
+	}
+
+	public static Row getUser(String name) throws Exception {
+		return users.getRow(name);
+	}
+
+	public static List<Row> getUserAndInvoices(String name) throws Exception {
+		return user.getRowWithRelation(name);
+	}
+
+	public static List<Row> getUserAndExpenses(String name) throws Exception {
+		return users.getRowWithRelations(name, db);
+	}
+
+	public static Row getInvoice(Integer invoiceUID) throws Exception {
+		return invoices.getRow(invoiceUID);
+	}
+
+	public static List<Row> getInvoiceAndItems(Integer invoiceUID) throws Exception {
+		return invoices.getRowWithRelations(invoiceUID, db);
+	}
+
+	public static Row getItem(String itemName) throws Exception {
+		return items.getRow(itemName);
 	}
 }

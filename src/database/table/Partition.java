@@ -33,7 +33,7 @@ public interface Partition<PrimaryKey extends Comparable<? super PrimaryKey>> {
   public List<PrimaryKey> getKeys();
   public void addRow(PrimaryKey key, Row row);
   public Row getRow(PrimaryKey key);
-  public void removeRow(PrimaryKey key);
+  public boolean removeRow(PrimaryKey key) throws HarambException;
   public int partitionNumber();
   public int size();
   public Dict<PrimaryKey, Row> rows();

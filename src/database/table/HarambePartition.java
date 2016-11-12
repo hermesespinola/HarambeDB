@@ -104,9 +104,16 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     return rows.getValue(key);
   }
 
-  public void removeRow(PrimaryKey key) {
+  // returns true if the removed row's primary key is the smallest in the partitions.
+  // returns false otherwise.
+  public boolean removeRow(PrimaryKey key) throws HarambException {
     rows.remove(key);
-    sortedKeys.remove(sortedKeys.indexOf(key));
+    PrimaryKey firstKey = sortedKeys.get(0);
+    PrimaryKey removedKey = sortedKeys.remove(sortedKeys.indexOf(key));
+    if (key == null) {
+      throw new HarambException("No such key");
+    }
+    return firstKey == removedKey;
   }
 
   public Dict<PrimaryKey, Row> rows() {

@@ -98,7 +98,12 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   public void removeRow(PrimaryKey key) throws HarambException {
     loadPartition(key);
-    currentPartition.removeRow(key);
+    // if the smallest key is removed update the avl tree
+    if (currentPartition.removeRow(key)) {
+      Integer ptNumber = partitions.get(key);
+      partitions.remove(key);
+      partitions.add(key, ptNumber);
+    }
   }
 
   // returns the added row

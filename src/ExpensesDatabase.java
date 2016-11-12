@@ -31,7 +31,7 @@ public final class ExpensesDatabase {
 			// add columns to the tables
 			users.addColumn("Address", String.class);
 			Column invoiceCol = users.addColumn("Invoices", Integer[].class);
-			invoices.addColumn("Total", Integer.class);
+			invoices.addColumn("Payment", Integer.class);
 			Column itemCol = invoices.addColumn("Items", String[].class);
 			items.addColumn("Expense", Integer.class);
 
@@ -67,7 +67,7 @@ public final class ExpensesDatabase {
 			Integer itemExpense = items.getRow(item).get(items.getColumn("Expense"));
 			total += itemExpense;
 		}
-		invoices.addRow(invoiceUID).set(items.getColumn("Total"), total)
+		invoices.addRow(invoiceUID).set(items.getColumn("Payment"), total)
 			.set(items.getColumn("Items"), itemsNames);
 
 		Integer[] currentInvoices = userRow.get(users.getColumn("Invoices"));
@@ -121,5 +121,19 @@ public final class ExpensesDatabase {
 
 	public static Row getItem(String itemName) throws Exception {
 		return items.getRow(itemName);
+	}
+
+	public int userSimilarity(String xName, String yName) throws Exception {
+		return Math.abs(getTotalPayments(xName) - getTotalPayments(yName));
+	}
+
+	public int getTotalPayments(String userName) throws Exception {
+		List<Row> userInvoices = users.getRowWithRelation(userName, db);
+		int total = 0;
+		for (int i = 1; i < userInvoices.size(); i++) {
+			Integer invoicePayment = userInvoices.get(i).get(invoices.getColumn("Payment"));
+			total += invoicePayment;
+		}
+		return total;
 	}
 }

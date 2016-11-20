@@ -1,15 +1,15 @@
 package database.table;
 
-import database.HarambException;
-import structures.list.List;
-import structures.dict.Dict;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.FileInputStream;
 import java.io.BufferedInputStream;
-import java.io.IOException;
+import java.io.ObjectInputStream;
+import database.HarambException;
+import java.io.FileInputStream;
 import database.table.row.Row;
 import java.io.Serializable;
+import structures.dict.Dict;
+import structures.list.List;
+import java.io.IOException;
+import java.io.IOException;
 
 // create the partition file when <init>
 public interface Partition<PrimaryKey extends Comparable<? super PrimaryKey>> {

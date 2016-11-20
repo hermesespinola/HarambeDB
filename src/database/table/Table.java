@@ -1,33 +1,29 @@
 package database.table;
 
-import java.util.Arrays;
-import structures.dict.Dict;
-import structures.dict.LinkedDict;
-import structures.list.List;
-import structures.list.ArrayLinearList;
-import structures.tree.AVL;
-import structures.node.KeyValueNode;
 import database.table.relation.Relation;
-import database.HarambException;
-import database.Database;
-import database.table.column.*;
-import database.table.row.*;
-import java.util.ArrayList;
-import java.io.File;
-import java.io.Serializable;
-import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
+import structures.list.ArrayLinearList;
+import structures.node.KeyValueNode;
 import java.io.BufferedInputStream;
+import structures.dict.LinkedDict;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import database.HarambException;
+import java.io.FileOutputStream;
+import database.table.column.*;
 import java.io.FileInputStream;
+import java.io.Serializable;
+import database.table.row.*;
+import structures.dict.Dict;
+import structures.list.List;
+import java.util.ArrayList;
+import structures.tree.AVL;
+import database.Database;
+import java.util.Arrays;
+import java.io.File;
 
-// TODO: check partitions avl when removing a row
 public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
   // avl tree containing the location and first value of the diferent partitions of the table
   private AVL<PrimaryKey, Integer> partitions;
-
-  // the name of the primary key column
-  // String pkColName; TODO: add this later
 
   // path to the table file
   private final String path;
@@ -46,9 +42,12 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   private transient static final int THRESHOLD = 50;
   private static final long serialVersionUID = 05L;
   public transient static final String extension = ".hbtb";
-  String tableName;
 
-  public Table(String dbPath, String tableName, Class<?> primaryKeyType) throws HarambException {
+  // name of the table and the PrimaryKey Column
+  String tableName, pkName;
+
+  public Table(String dbPath, String tableName, Class<?> primaryKeyType, String primaryKeyName) throws HarambException {
+    this.pkName = primaryKeyName;
     this.path = dbPath + tableName + '/';
     this.tableName = tableName;
     this.primaryKeyType = primaryKeyType;
@@ -64,7 +63,6 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
         throw new HarambException(e);
       }
     } else {
-      // TODO: hacer más cosas
       throw new HarambException("Table " + tableName + " already exists");
     }
     partitions = new AVL<>();
@@ -145,7 +143,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
         if (col.relationType() == Relation.Type.oneToOne) {
           rows.add(col.getRelatedTable(db).getRow(rows.get(0).get(col)));
         } else {
-          // if col.type() == RelationType.oneToMany it is guaranteed that every field in the column holds an array.
+          // it is guaranteed that every field in the related column holds an array.
           Table<OtherPrimaryKey> related = col.getRelatedTable(db);
           OtherPrimaryKey[] keys = rows.get(0).get(col);
           for (OtherPrimaryKey r : keys) {
@@ -187,7 +185,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     if (currentPartition == null) {
       currentPartition = Partition.load(this.path, partitionInfo.getValue());
     } else if (partitionInfo.getKey().compareTo(currentPartition.getKeys().get(0)) != 0) {
-      currentPartition.save(); // TODO: save only if data changed
+      currentPartition.save();
       currentPartition = Partition.load(this.path, partitionInfo.getValue());
     }
   }
@@ -210,6 +208,10 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return this.tableName;
   }
 
+  public String primaryKeyName() {
+    return this.pkName;
+  }
+
   @SuppressWarnings("unchecked")
   public static final <T extends Comparable<? super T>> Table<T> load(final String dbPath, final String tableName) throws HarambException {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
@@ -221,13 +223,4 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
       throw new HarambException(e);
     }
   }
-  //
-  // public static final void showMenu() {
-  //   System.out.println("1) Create table");
-  //   System.out.println("2) Load table");
-  //   System.out.println("3) Save table");
-  //   System.out.println("4) Add column");
-  //   System.out.println("5) Add row");
-  //   System.out.print(": ");
-  // }
 }

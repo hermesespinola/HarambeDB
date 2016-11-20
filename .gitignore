@@ -2,6 +2,7 @@
 *.hbdb
 *.hbtb
 *.hbpt
+cat
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

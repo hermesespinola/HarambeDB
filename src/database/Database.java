@@ -59,9 +59,9 @@ public class Database implements Serializable {
     }
   }
 
-  public <T extends Comparable<? super T>> Table<T> createTable(String tableName, Class<T> primaryKeyType) throws HarambException {
+  public <T extends Comparable<? super T>> Table<T> createTable(String tableName, Class<T> primaryKeyType, String primaryKeyName) throws HarambException {
     try {
-      Table<T> t = new Table<T>(this.path, tableName, primaryKeyType);
+      Table<T> t = new Table<T>(this.path, tableName, primaryKeyType, primaryKeyName);
       tableMap.add(tableName, tables.size());
       tables.add(t);
       return t;

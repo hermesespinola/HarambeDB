@@ -1,16 +1,16 @@
 package database.table;
 
-import structures.list.List;
 import structures.list.DoublyLinkedList;
-import structures.dict.Dict;
+import java.io.ObjectOutputStream;
 import structures.dict.LinkedDict;
-import database.table.row.Row;
+import java.io.ObjectInputStream;
 import database.HarambException;
+import java.io.FileOutputStream;
+import database.table.row.Row;
+import structures.list.List;
+import structures.dict.Dict;
 import java.io.Serializable;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
 
 public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>> implements Partition<PrimaryKey>, Serializable {
   private int partitionNumber;

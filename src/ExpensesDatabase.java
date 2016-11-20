@@ -24,9 +24,9 @@ public final class ExpensesDatabase {
 			// create the database
 			db = new Database("Expenses");
 			// create the tables
-			users = db.createTable("Users", String.class);
-			invoices = db.createTable("Invoices", Integer.class);
-			items = db.createTable("Items", String.class);
+			users = db.createTable("Users", String.class, "Name");
+			invoices = db.createTable("Invoices", Integer.class, "ID");
+			items = db.createTable("Items", String.class, "Name");
 
 			// add columns to the tables
 			users.addColumn("Address", String.class);

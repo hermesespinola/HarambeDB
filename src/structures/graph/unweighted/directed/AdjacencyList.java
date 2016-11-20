@@ -1,42 +1,45 @@
 package structures.graph.unweighted.directed;
 
 import structures.graph.unweighted.UnweightedGraph;
+import structures.list.ArrayLinearList;
 import structures.list.LinkedList;
 import structures.graph.Vertex;
 import structures.graph.Graph;
 
 public class AdjacencyList implements UnweightedGraph<ALVertex> {
-  ALVertex[] matrix;
+  ArrayLinearList<ALVertex> matrix;
   private int vertexCount;
   private static final long serialVersionUID = 34l;
 
   public AdjacencyList(int vertexCount) {
     this.vertexCount = vertexCount;
-    this.matrix = new ALVertex[vertexCount];
+    this.matrix = new ArrayLinearList<>();
     for (int i = 0; i < vertexCount; i++) {
-      this.matrix[i] = new ALVertex(i);
+      this.matrix.add(i, new ALVertex(i));
     }
   }
 
   public void addEdge(int from, int to) {
     if (from >= 0 && from < vertexCount && to >= 0 && to < vertexCount) {
       if (from == to) return;
-      ALVertex v1 = matrix[from];
-      ALVertex v2 = matrix[2];
-      this.matrix[from].connectVertex(this.matrix[to]);
+      this.matrix.get(from).connectVertex(this.matrix.get(to));
     } else throw new IndexOutOfBoundsException();
+  }
+
+  public void addVertex() {
+    this.matrix.add(vertexCount, new ALVertex(vertexCount++));
   }
 
   public void removeEdge(int from, int to) {
     if (from >= 0 && from < vertexCount && to > 0 && to < vertexCount) {
       if (from == to) return;
-      this.matrix[from].removeAdjacentVertex(this.matrix[to]);
+      this.matrix.get(from).removeAdjacentVertex(this.matrix.get(to));
     } else throw new IndexOutOfBoundsException();
   }
 
   public ALVertex getVertex(int vertex) {
     if (vertex >= 0 && vertex < vertexCount) {
-      return this.matrix[vertex];
+      return this.matrix.get(vertex);
     } else throw new IndexOutOfBoundsException();
   }
 
@@ -45,7 +48,7 @@ public class AdjacencyList implements UnweightedGraph<ALVertex> {
   }
 
   public ALVertex[] getGraph() {
-    return this.matrix;
+    return this.matrix.toArray();
   }
 
   public String toString() {

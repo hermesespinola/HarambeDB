@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.io.File;
 
-
 @SuppressWarnings("rawtypes")
 public class Database implements Serializable {
   private static final long serialVersionUID = 14L;
@@ -92,6 +91,18 @@ public class Database implements Serializable {
     tables.set(tableMap.getValue(tableName), null);
     tableMap.remove(tableName);
     saveDbObject();
+  }
+
+  public void createRelation(String table1, String table2) throws HarambException {
+    Table<?> t1 = tables.get(tableMap.getValue(table1));
+    Table<?> t2 = tables.get(tableMap.getValue(table2));
+    if (t1 == null) {
+      throw new HarambException("Table " + table1 + " does not exist");
+    }
+    if (t2 == null) {
+      throw new HarambException("Table " + table2 + " does not exist");
+    }
+
 
   }
 

@@ -130,6 +130,12 @@ public ListIterator<T> iterator(int index) {
         return new IteratorArray(index);
 }
 
+public T[] toArray() {
+  T[] r = (T[]) new Object[size];
+  System.arraycopy(r, 0, this.arr, 0, r.length);
+  return r;
+}
+
 public static void main(String[] args) {
         ArrayLinearList<String> list = new ArrayLinearList<String>();
 	list.add("jamon");

@@ -1,11 +1,13 @@
 package structures.graph;
 
 import structures.list.List;
+import java.io.Serializable;
 
-public abstract class Vertex<V extends Vertex<V>> {
+public abstract class Vertex<V extends Vertex<V>> implements Serializable {
   protected int value;
   protected Float distance = null;
   protected V previous = null;
+  private static final long serialVersionUID = 29l;
 
   public final V previous() {
     return this.previous;

@@ -1,10 +1,12 @@
 package structures.graph;
 
 import structures.graph.Vertex;
+import java.io.Serializable;
 
 public class Edge<V extends Vertex<V>> {
   V vertex;
   float weight;
+  private static final long serialVersionUID = 35l;
 
   public Edge(V v, float w) {
     this.vertex = v;

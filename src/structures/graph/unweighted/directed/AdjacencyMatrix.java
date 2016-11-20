@@ -11,6 +11,7 @@ public class AdjacencyMatrix implements UnweightedGraph<AMVertex> {
   ArrayMatrix<Boolean> matrix;
   AMVertex[] vertices;
   private int vertexCount; // matrix.size = vertexCount * vertexCount
+  private static final long serialVersionUID = 33l;
 
   public AdjacencyMatrix(int vertexCount) {
     this.vertexCount = vertexCount;
@@ -79,6 +80,7 @@ public class AdjacencyMatrix implements UnweightedGraph<AMVertex> {
 
 class AMVertex extends Vertex<AMVertex> {
   AdjacencyMatrix graph;
+  private static final long serialVersionUID = 30l;
 
   public AMVertex(int value, AdjacencyMatrix graph) {
     this.value = value;

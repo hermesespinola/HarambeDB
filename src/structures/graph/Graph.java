@@ -1,13 +1,15 @@
 package structures.graph;
 
-import structures.stack.*;
-import structures.list.List;
-import structures.queue.Queue;
 import structures.queue.ArrayQueue;
 import structures.graph.Vertex;
+import structures.queue.Queue;
+import java.io.Serializable;
+import structures.list.List;
+import structures.stack.*;
 
 @SuppressWarnings("unchecked")
-public interface Graph <V extends Vertex<V>> {
+public interface Graph <V extends Vertex<V>> extends Serializable {
+  static final long serialVersionUID = 32l;
   public void removeEdge(int i, int j);
   public Vertex<V> getVertex(int vertex);
   public int vertexCount();

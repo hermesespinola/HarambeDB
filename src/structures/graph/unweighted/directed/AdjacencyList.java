@@ -8,6 +8,7 @@ import structures.graph.Graph;
 public class AdjacencyList implements UnweightedGraph<ALVertex> {
   ALVertex[] matrix;
   private int vertexCount;
+  private static final long serialVersionUID = 34l;
 
   public AdjacencyList(int vertexCount) {
     this.vertexCount = vertexCount;
@@ -76,6 +77,7 @@ public class AdjacencyList implements UnweightedGraph<ALVertex> {
 
 class ALVertex extends Vertex<ALVertex> {
   LinkedList<ALVertex> adjacentVertices;
+  private static final long serialVersionUID = 31l;
 
   public ALVertex(int value) {
     this.value = value;

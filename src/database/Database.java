@@ -1,6 +1,6 @@
 package database;
 
-import structures.graph.unweighted.directed.AdjacencyMatrix;
+import structures.graph.unweighted.directed.AdjacencyList;
 import database.table.relation.Relation;
 import structures.list.ArrayLinearList;
 import database.table.column.Column;
@@ -33,7 +33,7 @@ public class Database implements Serializable {
   public transient ArrayLinearList<Table<?>> tables;
   public Dict<String, Integer> tableMap; // tableName -> table index in tables
 
-  protected AdjacencyMatrix relations;
+  protected AdjacencyList relations;
   protected final String path;
   protected final String dbName;
 
@@ -42,6 +42,7 @@ public class Database implements Serializable {
     this.dbName = dbName;
     tableMap = new LinkedDict<>();
     tables = new ArrayLinearList<>();
+    relations = new AdjacencyList(0);
 
     File dbDir = new File(this.path);
     if (!dbDir.exists()) {
@@ -93,17 +94,67 @@ public class Database implements Serializable {
     saveDbObject();
   }
 
-  public void createRelation(String table1, String table2) throws HarambException {
-    Table<?> t1 = tables.get(tableMap.getValue(table1));
-    Table<?> t2 = tables.get(tableMap.getValue(table2));
+  public void createRelation(String fromTable, String toTable, String fromTableColumn, Relation.Type type) throws HarambException {
+    int t1Idx = tableMap.getValue(fromTable), t2Idx = tableMap.getValue(toTable);
+    Table<?> t1 = tables.get(t1Idx);
+    Table<?> t2 = tables.get(t2Idx);
     if (t1 == null) {
-      throw new HarambException("Table " + table1 + " does not exist");
+      throw new HarambException("Table " + fromTable + " does not exist");
     }
     if (t2 == null) {
-      throw new HarambException("Table " + table2 + " does not exist");
+      throw new HarambException("Table " + toTable + " does not exist");
+    }
+    Column c = t1.getColumn(fromTableColumn);
+    if (c == null) {
+      throw new HarambException("Column " + fromTableColumn + " in table " + t1.name() + " does not exists");
     }
 
+    relations.addEdge(t1Idx, t2Idx);
+    t1.getColumn(fromTableColumn).createRelation(t2, type);
+  }
 
+  public Table<?> getRelation(String fromTable, String toTable, String fromTableColumn) throws HarambException {
+    int t1Idx = tableMap.getValue(fromTable), t2Idx = tableMap.getValue(toTable);
+    Table<?> t1 = tables.get(t1Idx);
+    Table<?> t2 = tables.get(t2Idx);
+    if (t1 == null) {
+      throw new HarambException("Table " + fromTable + " does not exist");
+    }
+    if (t2 == null) {
+      throw new HarambException("Table " + toTable + " does not exist");
+    }
+    Column c = t1.getColumn(fromTableColumn);
+    if (c == null) {
+      throw new HarambException("Column " + fromTableColumn + " in table " + t1.name() + " does not exists");
+    }
+
+    if (relations.getVertex(t1Idx).adjacentVertices().contains(relations.getVertex(t2Idx))) {
+      return t1.getColumn(fromTableColumn).getRelatedTable(this);
+    }
+    return null;
+  }
+
+  public void removeRelation(String fromTable, String toTable, String fromTableColumn) throws HarambException {
+    int t1Idx = tableMap.getValue(fromTable), t2Idx = tableMap.getValue(toTable);
+    Table<?> t1 = tables.get(t1Idx);
+    Table<?> t2 = tables.get(t2Idx);
+    if (t1 == null) {
+      throw new HarambException("Table " + fromTable + " does not exist");
+    }
+    if (t2 == null) {
+      throw new HarambException("Table " + toTable + " does not exist");
+    }
+    Column c = t1.getColumn(fromTableColumn);
+    if (c == null) {
+      throw new HarambException("Column " + fromTableColumn + " in table " + t1.name() + " does not exists");
+    }
+
+    if (!c.hasRelation()) {
+      throw new HarambException("Column " + fromTableColumn + "has no relation to " + t2.name());
+    }
+
+    c.removeRelation();
+    relations.removeEdge(t1Idx, t2Idx);
   }
 
   public static final Database load(final String dbName) throws HarambException {

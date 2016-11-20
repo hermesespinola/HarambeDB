@@ -49,6 +49,10 @@ public class LinkedList <T> implements List<T> {
     return -1;
   }
 
+  public boolean contains(T x) {
+    return this.indexOf(x) != -1;
+  }
+
   @Override
   public T remove(int index) {
     if (index < 0 || index >= this._size)

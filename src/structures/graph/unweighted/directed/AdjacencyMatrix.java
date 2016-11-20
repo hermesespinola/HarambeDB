@@ -101,16 +101,4 @@ class AMVertex extends Vertex<AMVertex> {
   public String toString() {
     return Integer.toString(this.value);
   }
-
-  public boolean equals(Object other) {
-    if (other == null) return false;
-    if (other == this) return true;
-    if (!(other instanceof AMVertex)) return false;
-    return this.value == ((AMVertex)other).value;
-  }
-
-  @Override
-  public int hashCode() {
-    return ((Integer)this.value).hashCode();
-  }
 }

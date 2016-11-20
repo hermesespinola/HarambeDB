@@ -32,4 +32,17 @@ public abstract class Vertex<V extends Vertex<V>> {
   public float weight() {
     return 1;
   }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == null) return false;
+    if (other == this) return true;
+    if (!(other instanceof Vertex)) return false;
+    return this.value == ((Vertex)other).value;
+  }
+
+  @Override
+  public int hashCode() {
+    return ((Integer)this.value).hashCode();
+  }
 }

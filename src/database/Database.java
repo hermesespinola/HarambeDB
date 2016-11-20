@@ -1,30 +1,31 @@
 package database;
 
-import structures.dict.Dict;
-import structures.dict.LinkedDict;
+import structures.graph.unweighted.directed.AdjacencyMatrix;
+import database.table.relation.Relation;
 import structures.list.ArrayLinearList;
+import database.table.column.Column;
+import java.io.BufferedInputStream;
+import java.io.ObjectOutputStream;
+import structures.dict.LinkedDict;
+import java.io.ObjectInputStream;
+import java.io.InputStreamReader;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import database.table.row.Row;
+import java.io.BufferedReader;
+import java.util.Collections;
+import database.table.Table;
+import java.io.Serializable;
+import structures.list.List;
+import structures.dict.Dict;
 import java.util.Comparator;
 import java.nio.file.Paths;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.io.File;
-import java.io.Serializable;
-import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.util.Collections;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import database.table.Table;
-
-import database.table.relation.Relation;
-import structures.list.List;
-import database.table.row.Row;
-import database.table.column.Column;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.io.File;
+
 
 @SuppressWarnings("rawtypes")
 public class Database implements Serializable {
@@ -33,7 +34,7 @@ public class Database implements Serializable {
   public transient ArrayLinearList<Table<?>> tables;
   public Dict<String, Integer> tableMap; // tableName -> table index in tables
 
-  // protected DirectedGraph<Column> relationships;
+  protected AdjacencyMatrix relations;
   protected final String path;
   protected final String dbName;
 

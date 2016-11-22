@@ -21,7 +21,11 @@ public class AdjacencyList implements UnweightedGraph<ALVertex> {
   }
 
   public void addEdge(int from, int to) {
-    if (from >= 0 && from < vertexCount && to >= 0 && to < vertexCount) {
+    int edgeToAdd = (from == vertexCount) ? from : (to == vertexCount) ? to : -1;
+    if (edgeToAdd != -1) {
+      matrix.add(new ALVertex(edgeToAdd));
+    }
+    if (from >= 0 && from <= vertexCount && to >= 0 && to <= vertexCount) {
       if (from == to) return;
       this.matrix.get(from).connectVertex(this.matrix.get(to));
     } else throw new IndexOutOfBoundsException();

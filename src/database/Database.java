@@ -189,7 +189,6 @@ public class Database implements Serializable {
     saveDbObject();
   }
 
-  // TODO: add primaryKey Column name to Table
   public static void main(String[] args) throws Exception {
     // Database db = new Database("Expenses");
     //

@@ -36,9 +36,14 @@ public final class ExpensesDatabase {
 			items.addColumn("Expense", Integer.class);
 
 			// create relations between the tables
-			invoiceCol.createRelation(invoices, Relation.Type.oneToMany);
-			itemCol.createRelation(items, Relation.Type.oneToMany);
+			db.createRelation("Users", "Invoices", "Invoices", Relation.Type.oneToMany);
+			db.createRelation("Invoices", "Items", "Items", Relation.Type.oneToMany);
+
+			// invoiceCol.createRelation(invoices, Relation.Type.oneToMany);
+			// itemCol.createRelation(items, Relation.Type.oneToMany);
 		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println();
 			try {
 				// maybe the database already exists, try to load it.
 				db = Database.load("Expenses");
@@ -135,5 +140,9 @@ public final class ExpensesDatabase {
 			total += invoicePayment;
 		}
 		return total;
+	}
+
+	public static void main(String[] args) {
+		System.out.println("Main of ExpensesDatabase");
 	}
 }

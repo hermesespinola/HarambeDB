@@ -1,6 +1,6 @@
 package structures.dict;
 import java.util.Iterator;
-import java.util.ArrayList; // TODO: change to structures.list.ArrayLinearList.
+import structures.list.ArrayLinearList;
 import java.util.Iterator;
 import java.io.Serializable;
 
@@ -160,8 +160,8 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
   /**
    * @return      An interator containing the keys of the hash table
   */
-  public ArrayList<Key> keys() {
-    ArrayList<Key> list = new ArrayList<Key>();
+  public ArrayLinearList<Key> keys() {
+    ArrayLinearList<Key> list = new ArrayLinearList<Key>();
     for (DictNode<Key, Val> x : table) {
       for (; x != null; x = x.next) {
         list.add(x.key);
@@ -173,8 +173,8 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
   /**
    * @return      An interator containing the values of the hash table
   */
-  public ArrayList<Val> values() {
-    ArrayList<Val> list = new ArrayList<Val>();
+  public ArrayLinearList<Val> values() {
+    ArrayLinearList<Val> list = new ArrayLinearList<Val>();
     for (DictNode<Key, Val> x : table) {
       for (; x != null; x = x.next) {
         list.add(x.value);

@@ -23,7 +23,7 @@ public class AdjacencyList implements UnweightedGraph<ALVertex> {
   public void addEdge(int from, int to) {
     int edgeToAdd = (from == vertexCount) ? from : (to == vertexCount) ? to : -1;
     if (edgeToAdd != -1) {
-      matrix.add(new ALVertex(edgeToAdd));
+      this.addVertex();
     }
     if (from >= 0 && from <= vertexCount && to >= 0 && to <= vertexCount) {
       if (from == to) return;

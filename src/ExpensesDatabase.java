@@ -43,7 +43,6 @@ public final class ExpensesDatabase {
 			// itemCol.createRelation(items, Relation.Type.oneToMany);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println();
 			try {
 				// maybe the database already exists, try to load it.
 				db = Database.load("Expenses");

@@ -48,7 +48,7 @@ public int size() {
 
 @Override
 public T get(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index >= this.size) throw new IndexOutOfBoundsException();
+        if (index < 0 || index > this.size) throw new IndexOutOfBoundsException();
         return this.arr[index];
 }
 

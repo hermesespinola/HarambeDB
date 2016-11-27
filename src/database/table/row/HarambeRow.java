@@ -17,12 +17,15 @@ import java.util.Iterator;
 * would be redundant to sore the primary key twice.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola
 * @author  Miguel Miranda
 * @see     Row
+* @see     Column
+* @see     ColumnList
+* @see     HarambeColumnList
 */
 public class HarambeRow implements Row {
   /**
@@ -33,6 +36,7 @@ public class HarambeRow implements Row {
 
   /**
   * Creates a new row with the ColumnList specified
+  * @param  list  The column list used to create the row
   */
   public HarambeRow(ColumnList list) {
     row = new ArrayLinearList<>(list.size());

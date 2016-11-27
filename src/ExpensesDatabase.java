@@ -11,7 +11,7 @@ import database.Database;
 *	class and is the final project of the datastructures class.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola

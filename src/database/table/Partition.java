@@ -30,7 +30,7 @@ import java.io.IOException;
 * relatively easy to write and should be used if the THRESHOLD is reasonably small.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola

@@ -10,8 +10,7 @@ import database.table.relation.Relation;
 * Represents a Column in the HarambeDB database.
 *
 * This class is used along the row class to obtain a field in a row.
-* Usually you also need to define a <a href="{@docRoot}/../path-to/ColumnList.html"> ColumnList </a>
-* in order to create a row.
+* Usually you also need to define a ColumnList in order to create a row.
 * The Row stores a list of elements and the column stores the index of the
 * desired element and its data type, this way the row can store any value as
 * long as it is an instance of the Object Class and when you try to retrieve it
@@ -19,11 +18,12 @@ import database.table.relation.Relation;
 * actual data type of the object then a HarambException is thrown.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola
 * @author  Miguel Miranda
+* @see     Relation
 */
 public class Column implements Serializable {
 
@@ -50,6 +50,7 @@ public class Column implements Serializable {
 
   /**
   * {@link Column#type}
+  * @return The relation type of this column, null if there is no relation
   */
   public Class<?> type() {
     return this.type;
@@ -57,6 +58,7 @@ public class Column implements Serializable {
 
   /**
   * {@link Column#index}
+  * @return  The index field of the column
   */
   public int index() {
     return index;
@@ -103,6 +105,8 @@ public class Column implements Serializable {
 
   /**
   * Obtains the related table
+  * @param  db                The database where the table is located
+  * @param  <PK>              The data type of the primary key of the table
   * @throws HarambException   If this column has no relation
   * @return                   the related table
   */

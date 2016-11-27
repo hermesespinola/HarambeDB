@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.io.File;
 
 /**
-* This Table Class, along with <a href="{@docRoot}/../path-to/partition.html">Partition</a> are the Backbone of HarambeDB, it
+* This Table Class, along with Partition are the Backbone of HarambeDB, it
 * creates a directory inside the project where the table and partition files
 * are stored, with extensions .hbtb and .hbpt respectibly, each partition has an
 * auto-increment ID to identify the partition uniquely.
@@ -37,7 +37,7 @@ import java.io.File;
 * value as you need.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola
@@ -106,6 +106,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   * @param  tableName       The name of the tablle
   * @param  primaryKeyType  The Class of the primary key
   * @param  primaryKeyName  The name of the primary key column
+  * @throws HarambException If there is an error creating the table file or if a database with the same name already exists
   */
   public Table(String dbPath, String tableName, Class<?> primaryKeyType, String primaryKeyName) throws HarambException {
     this.pkName = primaryKeyName;
@@ -133,6 +134,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   /**
   * {@link Table#primaryKeyType}
+  * @return The data type of the primary key
   */
   public Class<?> getPrimaryKeyType() {
     return this.primaryKeyType;
@@ -225,6 +227,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   * row of that relation is retrieved as well)
   * @param  key               The value of the primary key of the row
   * @param  db                The database the related tables are located
+  * @param  <OtherPrimaryKey> The data type of the primary key of the other table
   * @throws HarambException   If there is an error reading table or partition files
   * @return                   A list of rows containing the row of this table at position 0 and related rows from 1 up to n, where n is the size of the list.
   */
@@ -283,6 +286,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   * row of that relation is retrieved as well)
   * @param  key               The value of the primary key of the row
   * @param  db                The database the related tables are located
+  * @param  <OtherPrimaryKey> The data type of the primary key of the other table
   * @throws HarambException   If there is an error reading table or partition files
   * @return                   A list of size n where list[0] is the row of this column and list[1:n] is the chain of relations
   */
@@ -310,6 +314,8 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   /**
   * {@link ColumnList#get}
+  * @param  columnName  The name of the column to get
+  * @return             The column with the name specified
   */
   public Column getColumn(String columnName) {
     return this.columns.get(columnName);
@@ -331,6 +337,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   /**
   * {@link Table#tableName}
+  * @return The name of the table
   */
   public String name() {
     return this.tableName;
@@ -338,6 +345,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   /**
   * {@link Table#pkName}
+  * @return  The name of the primary key column
   */
   public String primaryKeyName() {
     return this.pkName;

@@ -6,11 +6,10 @@ import java.io.Serializable;
 
 /**
 * Main implementation of interface ColumnList for HarambeDB database. This class
-* uses a <a href="{@docRoot}/../path-to/LinkedDict.html">LinkedDict</a> to represent
-* the list of columns.
+* uses a LinkedDict to represent the list of columns.
 *.
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola

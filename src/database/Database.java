@@ -39,7 +39,7 @@ import java.io.File;
 * the database.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola
@@ -114,7 +114,9 @@ public class Database implements Serializable {
   * @param  tableName           The name of the table to create
   * @param  primaryKeyType      The Class of the primary key of the new table
   * @param  primaryKeyName      The name of the primary key column in the new table
+  * @param  <T>                 The data type of the primary key of the new table
   * @throws HarambException     If there is an error creating the new Table
+  * @return                     The new table
   */
   public <T extends Comparable<? super T>> Table<T> createTable(String tableName, Class<T> primaryKeyType, String primaryKeyName) throws HarambException {
     try {
@@ -132,6 +134,7 @@ public class Database implements Serializable {
   * Retrieves a table
   * @param  tableName         The name of the table to get
   * @param  type              The Class of the primary key column in the table
+  * @param  <T>               The data type of the primary key of the table
   * @throws HarambException   If the primary key is not of type 'type'
   * @return                   The table with the name specified
   */
@@ -248,6 +251,7 @@ public class Database implements Serializable {
   * Retrieves a database stored in the current project
   * @param  dbName            The name of the database to load
   * @throws HarambException   If there is an error reading HarambeDB files or if the database does not exist
+  * @return                   The loaded database object
   */
   public static final Database load(final String dbName) throws HarambException {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(

@@ -16,7 +16,7 @@ import java.io.Serializable;
 * is considered a bad OOP practice, this way we avoid data redundancy.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola
@@ -29,12 +29,14 @@ public interface ColumnList extends Serializable, Iterable<Column> {
   * Adds a column to the column list
   * @param  columnName  The name of the column to add
   * @param  col         The actual column containing its index and its data type
+  * @param  <T>         The data type of the column to add
   */
   public <T> void add(String columnName, Column col);
 
   /**
   * Retrieve the column with the specified name
   * @param  columnName  The name of the column to get
+  * @param  <T>         The data type of the column to get
   * @return             The column with the specified name, null if there is no column with that name
   */
   public <T> Column get(String columnName);

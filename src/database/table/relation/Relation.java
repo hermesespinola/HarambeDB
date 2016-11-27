@@ -17,7 +17,7 @@ import java.io.Serializable;
 * the type of the primary key of the related table.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola
@@ -30,12 +30,20 @@ public class Relation implements Serializable {
   * An enumeration that tells the type of relation that a column holds
   */
   public static enum Type implements Serializable {
+    /**
+    * Represents a one to one relation
+    */
     oneToOne,
+
+    /**
+    * Represents a one to many relation
+    */
     oneToMany;
   }
 
   /**
-  * The type of relation (oneToOne or oneToMany)
+  * The type of relation
+  * @see Relation.Type
   */
   Type type;
 
@@ -77,6 +85,8 @@ public class Relation implements Serializable {
 
   /**
   * {@link Relation#type}
+  * @return The type of relation of this relation
+  * @see  Relation.Type
   */
   public Type type() {
     return this.type;
@@ -84,6 +94,7 @@ public class Relation implements Serializable {
 
   /**
   * {@link Relation#otherPrimaryKeyType}
+  * @return The Class of the primary key of the related table
   */
   public Class<?> otherPrimaryKeyType() {
     return this.otherPrimaryKeyType;
@@ -91,6 +102,7 @@ public class Relation implements Serializable {
 
   /**
   * {@link Relation#tableName}
+  * @return The name of the table the relation points to
   */
   public String tableName() {
     return this.tableName;

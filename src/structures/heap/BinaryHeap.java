@@ -11,17 +11,34 @@ public class BinaryHeap<V extends Comparable<V>> implements Heap<V> {
   private V[] heap;
   private int length;
 
+  /**
+   * Default constructor. Takes if heap is max or min.
+   * 
+   * @param heapType type of heap
+   */
   public BinaryHeap(HeapType heapType) {
     this(DEF_SIZE, heapType);
   }
 
+  /**
+   * Constructor. Takes the initial size and if the heap is max or min.
+   * 
+   * @param initialSize size of the array
+   * @param heapType type of heap
+   */
   @SuppressWarnings("unchecked")
   public BinaryHeap(int initialSize, HeapType heapType) {
     this.heapType = heapType;
     this.heap = (V[]) new Comparable[initialSize];
     this.length = 0;
   }
-
+  
+  /**
+   * Constructor. Builds the heap over an existing array and takes if the heap is max or min.
+   * 
+   * @param values array of values
+   * @param heapType type of heap
+   */
   public BinaryHeap(V[] values, HeapType heapType) {
     this(DEF_SIZE + values.length, heapType);
     for (V v : values) {

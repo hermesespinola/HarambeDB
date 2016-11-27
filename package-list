@@ -1,0 +1,5 @@
+database
+database.table
+database.table.column
+database.table.relation
+database.table.row

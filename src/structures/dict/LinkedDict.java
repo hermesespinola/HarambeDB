@@ -4,6 +4,16 @@ import structures.list.ArrayLinearList;
 import java.util.Iterator;
 import java.io.Serializable;
 
+/**
+* An implementation of the Dictionary interface using an array of linked lists
+*
+* <p>This class is a member of the
+* <a href="{@docRoot}/index.html" target="_top">
+* HarambeDB database framework</a>.
+*
+* @author  Hermes Espínola
+* @author  Miguel Miranda
+*/
 @SuppressWarnings("rawtypes")
 public class LinkedDict<Key, Val> implements Dict<Key, Val> {
   private DictNode<Key, Val>[] table;
@@ -17,7 +27,7 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
 
   /**
    * Parametrized constructor. Sets initial size and load factor.
-   * 
+   *
    * @param initialSize initial size of the array
    * @param loadFactor maximum factor in order to resize
    */
@@ -31,16 +41,16 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     this.loadFactor = loadFactor;
     this.threshold = (int) (initialSize * loadFactor);
   }
-  
+
   /**
    * Parametrized constructor. Sets initial size and takes default load factor.
-   * 
+   *
    * @param initialSize initial size of the array
    */
   public LinkedDict(int initialSize) {
 	  this(initialSize, DEF_LOAD);
   }
-  
+
   /**
    * Default constructor. Takes default initial size and default load factor.
    */

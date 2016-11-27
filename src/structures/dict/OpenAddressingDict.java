@@ -6,6 +6,16 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ThreadLocalRandom;
 import java.io.Serializable;
 
+/**
+* An implementation of the Dictionary using open addressing and linear probing.
+*
+* <p>This class is a member of the
+* <a href="{@docRoot}/index.html" target="_top">
+* HarambeDB database framework</a>.
+*
+* @author  Hermes Espínola
+* @author  Miguel Miranda
+*/
 @SuppressWarnings("rawtypes")
 public class OpenAddressingDict<K, V> implements Dict<K, V> {
       private final static int DEF_SIZE = 128;
@@ -20,7 +30,7 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
 
       /**
        * Parametrized constructor. Sets initial size and load factor.
-       * 
+       *
        * @param initialSize initial size of the array
        * @param loadFactor maximum factor in order to resize
        */
@@ -35,16 +45,16 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
         b = new BigInteger(Integer.toString(ThreadLocalRandom.current().nextInt(0, 1001))).nextProbablePrime().longValue();
         p = new BigInteger(Integer.toString(m)).nextProbablePrime().longValue();
       }
-      
+
       /**
        * Parametrized constructor. Sets initial size and takes default load factor.
-       * 
+       *
        * @param initialSize initial size of the array
        */
       public OpenAddressingDict(int initialSize) {
         this(initialSize, DEF_LOAD);
       }
-      
+
       /**
        * Default constructor. Takes default initial size and default load factor.
        */

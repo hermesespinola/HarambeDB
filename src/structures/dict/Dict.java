@@ -15,12 +15,11 @@ import java.util.List;
 * a resize of the array is done whenever the number of pairs against the array capacity overflows a factor.
 *
 * <p>This class is a member of the
-* <a href="{@docRoot}/../index.html" target="_top">
+* <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
 *
 * @author  Hermes Espínola
 * @author  Miguel Miranda
-* @see     Column
 */
 public interface Dict<K,V> extends Serializable  {
   /**

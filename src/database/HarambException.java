@@ -8,7 +8,7 @@ public class HarambException extends IOException {
     super(message);
   }
   public HarambException(Exception e) {
-    super(e.getMessage());
+    super(e);
   }
 
   public String toString() {

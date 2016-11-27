@@ -162,6 +162,7 @@ public class Database implements Serializable {
       new FileInputStream("../" + dbName + '/' + dbName + extension)))) {
         Database db = (Database) ois.readObject();
         int size = db.tableMap.getSize();
+        // error here
         db.tables = new ArrayLinearList<Table<?>>(size, size * 2);
         for (String tableName : db.tableMap.keys()) {
           db.tables.set(db.tableMap.getValue(tableName), Table.load(db.path, tableName));

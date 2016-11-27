@@ -12,13 +12,52 @@ import structures.dict.Dict;
 import java.io.Serializable;
 import java.io.IOException;
 
+/**
+* The main Partition implementation in HarambeDB, it stores a dictionary of primary keys
+* mapping to rows. The Partition is stored in a .hbpt file inside a table directory.
+*
+* This implementation of the Partition interface stores a sorted list of the primary keys,
+* it could also be rewriten to sort the keys every time they are required, as stated in
+* the Partition documentation.
+*
+* <p>This class is a member of the
+* <a href="{@docRoot}/../index.html">
+* HarambeDB database framework</a>.
+*
+* @author  Hermes Espínola
+* @author  Miguel Miranda
+* @see     Table
+* @see     Row
+*/
 public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>> implements Partition<PrimaryKey>, Serializable {
+
+  /**
+  * The partition ID
+  */
   private int partitionNumber;
+
+  /**
+  * A list where keys are stored sorted
+  */
   private DoublyLinkedList<PrimaryKey> sortedKeys;
+
+  /**
+  * A dictionary of primary keys mapping to rows
+  */
   private Dict<PrimaryKey, Row> rows;
+
+  /**
+  * The path of to the partition file
+  */
   private final String path;
   private static final long serialVersionUID = 15L;
 
+  /**
+  * Creates a new partition inside a table directory and with an ID, if the ID
+  * already exists the other table will be overwritten.
+  * @param  tablePath         The path to the table directory
+  * @param  partitionNumber   The ID of the new partition
+  */
   public HarambePartition(String tablePath, int partitionNumber) {
     this.path = tablePath + "pt" + partitionNumber + extension;
     this.partitionNumber = partitionNumber;
@@ -33,6 +72,7 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     }
   }
 
+
   public String path() {
     return this.path;
   }
@@ -41,7 +81,10 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     return this.rows.getSize();
   }
 
-  // adds a key to the sortedKeys list
+  /**
+  * Adds a key in the sorted array of keys
+  * @param  key The key to add.
+  */
   private void addSortedKey(PrimaryKey key) {
     if (this.sortedKeys.size() == 0) {
       this.sortedKeys.add(key);
@@ -77,7 +120,6 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     }
   }
 
-  // save the partition in a .hbpt file
   public void save() throws HarambException {
     try (ObjectOutputStream oos = new ObjectOutputStream(
     new FileOutputStream(this.path))) {
@@ -90,6 +132,7 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
   public List<PrimaryKey> getKeys() {
     return sortedKeys;
   }
+
 
   public int partitionNumber() {
     return this.partitionNumber;
@@ -106,8 +149,6 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     return rows.getValue(key);
   }
 
-  // returns true if the removed row's primary key is the smallest in the partitions.
-  // returns false otherwise.
   public boolean removeRow(PrimaryKey key) throws HarambException {
     rows.remove(key);
     PrimaryKey firstKey = sortedKeys.get(0);

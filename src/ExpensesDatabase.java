@@ -38,11 +38,7 @@ public final class ExpensesDatabase {
 			// create relations between the tables
 			db.createRelation("Users", "Invoices", "Invoices", Relation.Type.oneToMany);
 			db.createRelation("Invoices", "Items", "Items", Relation.Type.oneToMany);
-
-			// invoiceCol.createRelation(invoices, Relation.Type.oneToMany);
-			// itemCol.createRelation(items, Relation.Type.oneToMany);
 		} catch (Exception e) {
-			e.printStackTrace();
 			try {
 				// maybe the database already exists, try to load it.
 				db = Database.load("Expenses");
@@ -60,29 +56,13 @@ public final class ExpensesDatabase {
 		items.addRow(itemName).set(items.getColumn("Expense"), itemExpense);
 	}
 
-	// items must be in Items table
-	public static void addInvoice(String userName, Integer invoiceUID, String[] itemsNames) throws Exception {
-		Row userRow = users.getRow(userName);
-		if (userRow == null) {
-			throw new RuntimeException("No such user: " + userName);
-		}
-		int total = 0;
-		for (String item : itemsNames) {
-			Integer itemExpense = items.getRow(item).get(items.getColumn("Expense"));
-			total += itemExpense;
-		}
-		invoices.addRow(invoiceUID).set(items.getColumn("Payment"), total)
-			.set(items.getColumn("Items"), itemsNames);
-
-		Integer[] currentInvoices = userRow.get(users.getColumn("Invoices"));
-		Integer[] newInvoices = new Integer[currentInvoices.length + 1];
-		System.arraycopy(currentInvoices, 0, newInvoices, 0, currentInvoices.length);
-		newInvoices[currentInvoices.length] = invoiceUID;
-		userRow.set(users.getColumn("Invoices"), newInvoices);
-	}
 
 	public static void addUser(String name, String address, Integer[] invoices) throws Exception {
 		users.addRow(name).set(users.getColumn("Address"), address).set(users.getColumn("Invoices"), invoices);
+	}
+
+	public static void addUser(String name, String address) throws Exception {
+		users.addRow(name).set(users.getColumn("Address"), address).set(users.getColumn("Invoices"), new Integer[1]);
 	}
 
 	public static void delteUser(String userName, boolean removeInvoices) throws Exception {
@@ -141,7 +121,44 @@ public final class ExpensesDatabase {
 		return total;
 	}
 
-	public static void main(String[] args) {
-		System.out.println("Main of ExpensesDatabase");
+	// items must be in Items table
+	public static void addInvoice(String userName, Integer invoiceUID, String[] itemsNames) throws Exception {
+		Row userRow = users.getRow(userName);
+		if (userRow == null) {
+			throw new RuntimeException("No such user: " + userName);
+		}
+		int total = 0;
+		for (String item : itemsNames) {
+			Integer itemExpense = items.getRow(item).get(items.getColumn("Expense"));
+			total += itemExpense;
+		}
+		invoices.addRow(invoiceUID).set(invoices.getColumn("Payment"), total)
+		.set(invoices.getColumn("Items"), itemsNames);
+
+		Integer[] currentInvoices = userRow.get(users.getColumn("Invoices"));
+		Integer[] newInvoices = new Integer[currentInvoices.length + 1];
+		System.arraycopy(currentInvoices, 0, newInvoices, 0, currentInvoices.length);
+		newInvoices[currentInvoices.length] = invoiceUID;
+		userRow.set(users.getColumn("Invoices"), newInvoices);
+	}
+
+	public static void main(String[] args) throws Exception {
+		// addUser("Hermes", "Aqui");
+		// addUser("Mike", "Allá");
+		// addUser("Eros", "Aquí también");
+		// addItem("Huevos", 30);
+		// addItem("Pan", 20);
+		// addItem("Jamon", 15);
+		// addItem("Queso", 5);
+		// addItem("Mayonesa", 28);
+		//
+		// addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
+		// addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
+		// addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
+		// addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
+
+		System.out.println(getUser("Hermes"));
+		System.out.println(getUser("Mike"));
+		System.out.println(getUser("Eros"));
 	}
 }

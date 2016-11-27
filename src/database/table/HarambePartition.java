@@ -95,7 +95,9 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     return this.partitionNumber;
   }
 
-  public void addRow(PrimaryKey key, Row row) {
+  public void addRow(PrimaryKey key, Row row) throws HarambException {
+    if (rows.getValue(key) != null)
+      throw new HarambException("Key already exists: " + key);
     rows.add(key, row);
     this.addSortedKey(key);
   }

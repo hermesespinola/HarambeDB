@@ -31,7 +31,7 @@ public interface Partition<PrimaryKey extends Comparable<? super PrimaryKey>> {
   public void save() throws HarambException; // same as Table's saveCurrentPartition and savePartition
   public String path(); // return the path to the partition file
   public List<PrimaryKey> getKeys();
-  public void addRow(PrimaryKey key, Row row);
+  public void addRow(PrimaryKey key, Row row) throws HarambException;
   public Row getRow(PrimaryKey key);
   public boolean removeRow(PrimaryKey key) throws HarambException;
   public int partitionNumber();

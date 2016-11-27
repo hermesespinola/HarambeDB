@@ -181,12 +181,4 @@ public class BinaryHeap<V extends Comparable<V>> implements Heap<V> {
     MaxHeap,
     MinHeap
   }
-
-  public static void main(String[] args) {
-    BinaryHeap<Integer> heap = new BinaryHeap<Integer>(new Integer[] {3, 4, 7, 3, 5, 6, 8, 9, 2, 1, 7, 10}, HeapType.MinHeap);
-    System.out.println(heap);
-    while (!heap.isEmpty()) {
-      System.out.println(heap.pop());
-    }
-  }
 }

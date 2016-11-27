@@ -252,22 +252,18 @@ public final class ExpensesDatabase {
 	}
 
 	public static void main(String[] args) throws Exception {
-		// addUser("Hermes", "Aqui");
-		// addUser("Mike", "Allá");
-		// addUser("Eros", "Aquí también");
-		// addItem("Huevos", 30);
-		// addItem("Pan", 20);
-		// addItem("Jamon", 15);
-		// addItem("Queso", 5);
-		// addItem("Mayonesa", 28);
-		//
-		// addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
-		// addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
-		// addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
-		// addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
+		addUser("Hermes", "Aqui");
+		addUser("Mike", "Allá");
+		addUser("Eros", "Aquí también");
+		addItem("Huevos", 30);
+		addItem("Pan", 20);
+		addItem("Jamon", 15);
+		addItem("Queso", 5);
+		addItem("Mayonesa", 28);
 
-		System.out.println(getUser("Hermes"));
-		System.out.println(getUser("Mike"));
-		System.out.println(getUser("Eros"));
+		addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
+		addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
+		addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
+		addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
 	}
 }

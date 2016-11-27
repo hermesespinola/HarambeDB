@@ -18,6 +18,12 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
       private int threshold;
       private static final long serialVersionUID = 3L;
 
+      /**
+       * Parametrized constructor. Sets initial size and load factor.
+       * 
+       * @param initialSize initial size of the array
+       * @param loadFactor maximum factor in order to resize
+       */
       @SuppressWarnings("unchecked")
       public OpenAddressingDict(int initialSize, float loadFactor) {
         this.m = initialSize;
@@ -29,11 +35,19 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
         b = new BigInteger(Integer.toString(ThreadLocalRandom.current().nextInt(0, 1001))).nextProbablePrime().longValue();
         p = new BigInteger(Integer.toString(m)).nextProbablePrime().longValue();
       }
-
+      
+      /**
+       * Parametrized constructor. Sets initial size and takes default load factor.
+       * 
+       * @param initialSize initial size of the array
+       */
       public OpenAddressingDict(int initialSize) {
         this(initialSize, DEF_LOAD);
       }
-
+      
+      /**
+       * Default constructor. Takes default initial size and default load factor.
+       */
       public OpenAddressingDict() {
         this(DEF_SIZE, DEF_LOAD);
       }
@@ -205,71 +219,6 @@ public class OpenAddressingDict<K, V> implements Dict<K, V> {
 
         public boolean hasNext() {
           return numeroDeCosasQueYaPasaron < n;
-        }
-      }
-
-      public static void main(String[] args) {
-        OpenAddressingDict<String, String> dict = new OpenAddressingDict<>();
-        dict.add("Lucio", "Pez");
-        System.out.println(dict.getValue("Lucio"));
-        System.out.println();
-        dict.add("Pichón", "Pajaro");
-        System.out.println();
-        System.out.println(dict.getValue("Lucio"));
-        dict.add("Popo", "cosas");
-        dict.add("Vaso", "Vierre");
-        System.out.println(dict.getValue("Lucio"));
-        dict.add("Verde", "Vierre");
-        dict.add("Pez", "Poisson");
-        dict.add("Wololo", "AOfE");
-        dict.add("qwerty", "asdfg");
-        System.out.println();
-        System.out.println(dict.hash("Pez"));
-        System.out.println(dict.getValue("Lucio"));
-        System.out.println(dict.getValue("Popo"));
-        System.out.println(dict.getValue("Vaso"));
-        System.out.println(dict.getValue("Wololo"));
-        System.out.println(dict.threshold);
-        System.out.println(dict.isEmpty());
-        System.out.println(dict.contains("Verde"));
-        System.out.println(dict.contains("Wololo"));
-        System.out.println(dict.contains("asdsad"));
-        System.out.println(dict);
-        System.out.println(dict.remove("Pichón"));
-        System.out.println(dict.remove("Lucio"));
-        System.out.println(dict.remove("Vaso"));
-        System.out.println(dict.remove("Wololo"));
-        System.out.println(dict.remove("querty"));
-        System.out.println(dict.remove("Popo"));
-        System.out.println(dict.remove("Pez"));
-        System.out.println(dict.remove("Verde"));
-        System.out.println(dict.isEmpty());
-        System.out.println(dict.remove("qwerty"));
-        System.out.println(dict);
-        dict.add("Lucio", "Pez");
-        System.out.println(dict.getValue("Lucio"));
-        System.out.println();
-        dict.add("Pichón", "Pajaro");
-        System.out.println();
-        System.out.println(dict.getValue("Lucio"));
-        dict.add("Popo", "cosas");
-        dict.add("Vaso", "Vierre");
-
-        System.out.println("Iterador: juejuejeue");
-        Iterator<String> keys = dict.keys();
-        Iterator<String> values = dict.values();
-
-        while(keys.hasNext()) {
-          System.out.println(keys.next());
-          System.out.println(keys.hasNext());
-        }
-        while (values.hasNext()) {
-          System.out.println(values.next());
-          System.out.println(values.hasNext());
-        }
-
-        for (String key : dict.keys()) {
-          System.out.println(key);
         }
       }
 

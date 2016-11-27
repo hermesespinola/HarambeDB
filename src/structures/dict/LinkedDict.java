@@ -16,10 +16,11 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
   private static final long serialVersionUID = 2L;
 
   /**
-   * @param  initialSize the initial size of the table
-   * @param  loadFactor maximum amount of elements in the table
-   * @return      A hash table instance using LinkedList
-  */
+   * Parametrized constructor. Sets initial size and load factor.
+   * 
+   * @param initialSize initial size of the array
+   * @param loadFactor maximum factor in order to resize
+   */
   @SuppressWarnings("unchecked")
   public LinkedDict(int initialSize, float loadFactor) {
     if (loadFactor > 1 || loadFactor <= 0)
@@ -30,18 +31,24 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     this.loadFactor = loadFactor;
     this.threshold = (int) (initialSize * loadFactor);
   }
-
+  
   /**
-   * @return      A hash table instance using LinkedList
-  */
+   * Parametrized constructor. Sets initial size and takes default load factor.
+   * 
+   * @param initialSize initial size of the array
+   */
+  public LinkedDict(int initialSize) {
+	  this(initialSize, DEF_LOAD);
+  }
+  
+  /**
+   * Default constructor. Takes default initial size and default load factor.
+   */
   public LinkedDict() {
     this(INIT_CAP, DEF_LOAD);
   }
 
-  /**
-   * @param  k the key of the element
-   * @return      A value in the hash table
-  */
+
   public Val getValue(Key k) {
     checkKey(k);
     for (DictNode<Key,Val> x = table[hash(k)]; x != null; x = x.next) {
@@ -50,21 +57,11 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     return null;
   }
 
-  /**
-   * @param  k the key to check
-   * @return      true if the key is in the hash table, false otherwise
-  */
   public boolean contains(Key k) {
     checkKey(k);
     return getValue(k) != null;
   }
 
-  /**
-   * maps the specified value in the hash table using the provided key.
-   * @param  k the key to map the value
-   * @param  v the value to map
-   * @return      The previous value mapped to that key, null if the key was not mapped already
-  */
   public void add(Key k, Val v) {
     checkKey(k);
     if (n >= threshold) rehash();
@@ -82,10 +79,6 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     n++;
   }
 
-  /**
-   * @param  k  The key to remove
-   * @return      The value mapped to the key provided, null if the key is not in the table
-  */
   public Val remove(Key k) {
     checkKey(k);
     DictNode<Key,Val> x = table[hash(k)];
@@ -106,22 +99,14 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     return null;
   }
 
-  /**
-   * erases the contents of the table
-  */
   public void clear() {
     for (DictNode<Key, Val> root : table) {
       root = null;
     }
   }
 
-  /**
-   *  duplicates the size of the table and rehashes all the elements in the new table
-  */
   @SuppressWarnings("unchecked")
   private void rehash() {
-    // Create  a copy of the old table and set this.table to a new table so
-    // I'm able to reuse the add function
     DictNode<Key, Val>[] oldTable = new DictNode[m];
     System.arraycopy(this.table, 0, oldTable, 0, m);
     this.table = new DictNode[m*2];
@@ -136,30 +121,18 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     oldTable = null;
   }
 
-  /**
-   * @return if the table has no elements
-  */
   public boolean isEmpty() {
     return n == 0;
   }
 
-  /**
-   * @return      The number of elements in the table
-  */
   public int getSize() {
     return n;
   }
 
-  /**
-   * @return      An integer that maps to an index in the table
-  */
   public int hash(Key k) {
     return k.hashCode() & 0x7FFFFFF % m;
   }
 
-  /**
-   * @return      An interator containing the keys of the hash table
-  */
   public ArrayLinearList<Key> keys() {
     ArrayLinearList<Key> list = new ArrayLinearList<Key>();
     for (DictNode<Key, Val> x : table) {
@@ -170,9 +143,6 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     return list;
   }
 
-  /**
-   * @return      An interator containing the values of the hash table
-  */
   public ArrayLinearList<Val> values() {
     ArrayLinearList<Val> list = new ArrayLinearList<Val>();
     for (DictNode<Key, Val> x : table) {
@@ -217,31 +187,5 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
     sb.setLength(sb.length() > 2 ? sb.length()-2 : sb.length());
     sb.append(" }");
     return sb.toString();
-  }
-
-  public static void main(String[] args) {
-    LinkedDict<String, String> dict = new LinkedDict<>();
-    System.out.println(dict.isEmpty());
-    dict.add("Lucio", "Pez");
-    System.out.println(dict.getValue("Lucio"));
-    dict.add("Pichón", "Pajaro");
-    dict.add("Tres", "3");
-    dict.add("Vaso", "Vierre");
-    System.out.println(dict.threshold);
-    dict.add("Verde", "Vierre");
-    dict.add("Pez", "Poisson");
-    dict.add("Wololo", "AOfE");
-    dict.add("qwerty", "asdfg");
-
-    System.out.println(dict);
-
-    System.out.println();
-    for (String k : dict.keys()) {
-      System.out.println(k);
-    }
-    System.out.println();
-    for (String v : dict.values()) {
-      System.out.println(v);
-    }
   }
 }

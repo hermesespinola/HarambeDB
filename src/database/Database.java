@@ -70,6 +70,11 @@ public class Database implements Serializable {
   protected AdjacencyList relations;
 
   /**
+  * The root directory for HarambeDB, where databases will be stored
+  */
+  public transient static final String rootDir = "../";
+
+  /**
   * The local path to the database directory
   */
   protected final String path;
@@ -86,7 +91,7 @@ public class Database implements Serializable {
   * @throws HarambException   If the database already exists or if there is an error writing the database object
   */
   public Database(String dbName) throws HarambException {
-    this.path = "../" + dbName + '/';
+    this.path = rootDir + dbName + '/';
     this.dbName = dbName;
     tableMap = new LinkedDict<>();
     tables = new ArrayLinearList<>();

@@ -13,7 +13,7 @@ import java.io.IOException;
 * @author  Hermes Espínola
 * @author  Miguel Miranda
 */
-public class HarambException extends IOException {
+public class HarambException extends RuntimeException {
   private static final long serialVersionUID = 27L;
   public HarambException(String message) {
     super(message);

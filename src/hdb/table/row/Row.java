@@ -41,4 +41,15 @@ public interface Row extends Serializable, Iterable<Object> {
   * @return         The value stored in the field with column 'column', null if there is no such column in the row
   */
   public <T> T get(Column column);
+
+  /**
+  * Prints the row
+  */
+  public void print();
+
+  /**
+  * Return the size of the row
+  * @return The size of the row
+  */
+  public int size();
 }

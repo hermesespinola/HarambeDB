@@ -4,6 +4,7 @@ import structures.list.ArrayLinearList;
 import hdb.HarambException;
 import hdb.table.column.*;
 import java.util.Iterator;
+import java.util.Arrays;
 
 /**
 * Main implementation of interface Row for HarambeDB hdb.
@@ -64,8 +65,11 @@ public class HarambeRow implements Row {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T get(Column column) {
-    return (T) row.get(column.index());
+  public <T> T get(Column col) {
+    while (col.index() > row.size()) {
+      row.add(null);
+    }
+    return (T) row.get(col.index());
   }
 
   public Iterator<Object> iterator() {
@@ -74,5 +78,19 @@ public class HarambeRow implements Row {
 
   public String toString() {
     return row.toString();
+  }
+
+  public int size() {
+    return this.row.size();
+  }
+
+  public void print() {
+    for (Object field : row) {
+      if (field.getClass().isArray())
+        System.out.print(Arrays.toString((Object[])field) + " ");
+      else
+        System.out.print(field + " ");
+    }
+    System.out.println();
   }
 }

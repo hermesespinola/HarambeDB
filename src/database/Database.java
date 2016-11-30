@@ -265,7 +265,7 @@ public class Database implements Serializable {
   */
   public static final Database load(final String dbName) throws HarambException {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
-      new FileInputStream("../" + dbName + '/' + dbName + extension)))) {
+      new FileInputStream(rootDir + dbName + '/' + dbName + extension)))) {
         Database db = (Database) ois.readObject();
         int size = db.tableMap.getSize();
         // error here

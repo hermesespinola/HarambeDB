@@ -4,6 +4,7 @@ import hdb.table.relation.Relation;
 import hdb.table.column.Column;
 import hdb.HarambException;
 import hdb.table.row.Row;
+import java.util.Arrays;
 import hdb.table.Table;
 import java.util.Comparator;
 import structures.list.List;
@@ -66,25 +67,23 @@ public final class ExpensesDatabase {
 
 			// add columns to the tables
 			users.addColumn("Address", String.class);
-			Column invoiceCol = users.addColumn("Invoices", Integer[].class);
+			users.addColumn("Invoices", Integer[].class);
 			invoices.addColumn("Payment", Integer.class);
-			Column itemCol = invoices.addColumn("Items", String[].class);
+			invoices.addColumn("Items", String[].class);
 			items.addColumn("Expense", Integer.class);
 
 			// create relations between the tables
 			db.createRelation("Users", "Invoices", "Invoices", Relation.Type.oneToMany);
 			db.createRelation("Invoices", "Items", "Items", Relation.Type.oneToMany);
+			db.save();
 		} catch (Exception e) {
-			try {
+			if (e instanceof HarambException) {
 				// maybe the database already exists, try to load it.
 				db = Database.load("Expenses");
 				users = db.getTable("Users", String.class);
 				invoices = db.getTable("Invoices", Integer.class);
 				items = db.getTable("Items", String.class);
-			} catch (Exception e2) {
-				e2.printStackTrace();
-				System.exit(-1);
-			}
+			}	else throw e;
 		}
 	}
 
@@ -116,7 +115,7 @@ public final class ExpensesDatabase {
 	*	@throws HarambException		If there is some error reading or writing to the database
 	*/
 	public static void addUser(String name, String address) throws HarambException {
-		users.addRow(name).set(users.getColumn("Address"), address).set(users.getColumn("Invoices"), new Integer[1]);
+		users.addRow(name).set(users.getColumn("Address"), address);
 	}
 
 	/**
@@ -125,7 +124,7 @@ public final class ExpensesDatabase {
 	* @param	removeInvoices		Tells if the invoices related to the user should be removed as well
 	*	@throws HarambException		If there is some error reading or writing to the database
 	*/
-	public static void delteUser(String userName, boolean removeInvoices) throws HarambException {
+	public static void deleteUser(String userName, boolean removeInvoices) throws HarambException {
 		if (removeInvoices) {
 			Integer[] uids = users.getRow(userName).get(users.getColumn("Invoices"));
 			for (Integer invoiceId : uids) {
@@ -263,25 +262,46 @@ public final class ExpensesDatabase {
 		.set(invoices.getColumn("Items"), itemsNames);
 
 		Integer[] currentInvoices = userRow.get(users.getColumn("Invoices"));
-		Integer[] newInvoices = new Integer[currentInvoices.length + 1];
-		System.arraycopy(currentInvoices, 0, newInvoices, 0, currentInvoices.length);
-		newInvoices[currentInvoices.length] = invoiceUID;
-		userRow.set(users.getColumn("Invoices"), newInvoices);
+		if (currentInvoices != null) {
+			Integer[] newInvoices = new Integer[currentInvoices.length + 1];
+			System.arraycopy(currentInvoices, 0, newInvoices, 0, currentInvoices.length);
+			newInvoices[currentInvoices.length] = invoiceUID;
+			userRow.set(users.getColumn("Invoices"), newInvoices);
+		} else {
+			userRow.set(users.getColumn("Invoices"), new Integer[] {invoiceUID});
+		}
 	}
 
+	/**
+	* main method for testing purposes
+	*/
 	public static void main(String[] args) throws HarambException {
-		addUser("Hermes", "Aqui");
-		addUser("Mike", "Allá");
-		addUser("Eros", "Aquí también");
-		addItem("Huevos", 30);
-		addItem("Pan", 20);
-		addItem("Jamon", 15);
-		addItem("Queso", 5);
-		addItem("Mayonesa", 28);
+		// deleteUser("Hermes", false); // should return an exception
 
-		addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
-		addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
-		addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
-		addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
+		// addUser("Hermes", "Aqui");
+		// addUser("Mike", "Allá");
+		// addUser("Eros", "Aquí también");
+		// addUser("Santiago", "Vallarta");
+		// addUser("Martina", "Tepic");
+		//
+		// addItem("Huevos", 30);
+		// addItem("Pan", 20);
+		// addItem("Jamon", 15);
+		// addItem("Queso", 5);
+		// addItem("Mayonesa", 28);
+
+		// Row eros = getUser("Eros");
+		// System.out.println((String)eros.get(users.getColumn("Address")));
+		// Integer[] erosInv = eros.get(users.getColumn("Invoices"));
+		// System.out.println(Arrays.toString(erosInv));
+		// System.out.println(getItem("Huevos"));
+
+		// addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
+		// addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
+		// addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
+		// addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
+
+		users.prettyPrint("Eros", getUserAndExpenses("Eros"));
+		// System.out.println(getUserAndExpenses("Hermes"));
 	}
 }

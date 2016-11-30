@@ -15,8 +15,8 @@ import java.io.Serializable;
 import hdb.table.row.*;
 import structures.dict.Dict;
 import structures.list.List;
-import java.util.ArrayList;
 import structures.tree.AVL;
+import java.util.ArrayList;
 import hdb.Database;
 import java.util.Arrays;
 import java.io.File;
@@ -355,6 +355,85 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   */
   public String primaryKeyName() {
     return this.pkName;
+  }
+
+  private void appendBlankSpaces(StringBuilder sb, int amount) {
+    for (int i = 0; i < amount; i++) {
+      sb.append(' ');
+    }
+  }
+
+  /**
+  * Calculate the difference between the two elements and adds them in such a way
+  * that they are aligned.
+  */
+  private void center(StringBuilder columns, StringBuilder row, String cF, String rF) {
+    int diff = cF.length() - rF.length();
+    if (diff == 0) {
+      columns.append(' ').append(cF).append(' ');
+      row.append(' ').append(rF).append(' ');
+    } else if (diff < 0) {
+      float half = ((float) Math.abs(diff)) / 2;
+      row.append(' ').append(rF).append(' ');
+      appendBlankSpaces(columns, 1 + (int)Math.ceil(half));
+      columns.append(cF);
+      appendBlankSpaces(columns, 1 + (int)Math.floor(half));
+    } else {
+      float half = ((float) diff) / 2;
+      columns.append(' ').append(cF).append(' ');
+      appendBlankSpaces(row, 1 + (int)Math.ceil(half));
+      row.append(rF);
+      appendBlankSpaces(row, 1 + (int)Math.floor(half));
+    }
+  }
+
+  /**
+  * Prints a relation obtained from this table, (i.e. with relations=getRowWithRelation()).
+  * @param  key  The key of the row to print
+  * @param  The result of some method to obtain the relations of a row
+  */
+  public void prettyPrint(PrimaryKey key, List<Row> relations) {
+    StringBuilder cols = new StringBuilder();
+    StringBuilder row = new StringBuilder();
+
+    center(cols, row, pkName, key.toString());
+
+    List<String> colNames = columns.names();
+
+    for (int i = 0; i < columns.size(); i++) {
+      Object field = relations.get(0).get(columns.get(colNames.get(i)));
+      String fieldString = (field.getClass().isArray()) ? Arrays.toString((Object[])field) : field.toString();
+      center(cols, row, colNames.get(i), fieldString);
+    }
+
+    // print results
+    System.out.println(cols);
+    StringBuilder separator = new StringBuilder();
+    for (int i = 0; i < cols.length(); i++) {
+      separator.append('-');
+    }
+    System.out.println(separator);
+    System.out.println(row);
+    System.out.println(separator);
+
+    int depth = 0;
+    int previousRowSize = 0;
+    for (int i = 1; i < relations.size(); i++) {
+      Row r = relations.get(i);
+      if (previousRowSize != r.size()) {
+        if (relations.get(i - 1).size() == relations.get(i + 1).size()) {
+          System.out.println(separator);
+          depth--;
+        } else {
+          depth++;
+        }
+        previousRowSize = r.size();
+      }
+      for (int j = 0; j < depth; j++) {
+        System.out.print("\t");
+      }
+      relations.get(i).print();
+    }
   }
 
   @SuppressWarnings("unchecked")

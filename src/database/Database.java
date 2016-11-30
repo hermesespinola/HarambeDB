@@ -38,6 +38,11 @@ import java.io.File;
 * because a new node is added to the graph every time a new table is added to
 * the database.
 *
+* The rootDir static constant is used to keep track of HarambeDB files on your system,
+* You can change this to wherever you want to store your database files.
+* If you have already created databases and you want to change this value make
+* sure to move all files in the old directory to the new directory.
+*
 * <p>This class is a member of the
 * <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.

@@ -1,8 +1,9 @@
 package hdb.table.column;
 
 import structures.dict.LinkedDict;
-import java.util.Iterator;
+import structures.list.List;
 import java.io.Serializable;
+import java.util.Iterator;
 
 /**
 * Main implementation of interface ColumnList for HarambeDB hdb. This class
@@ -48,5 +49,9 @@ public class HarambeColumnList implements ColumnList {
 
   public Iterator<Column> iterator() {
     return columns.values().iterator();
+  }
+
+  public List<String> names() {
+    return columns.keys();
   }
 }

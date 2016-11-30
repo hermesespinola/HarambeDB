@@ -1,6 +1,7 @@
 package hdb.table.column;
 
 import structures.dict.LinkedDict;
+import structures.list.List;
 import java.io.Serializable;
 
 /**
@@ -54,4 +55,10 @@ public interface ColumnList extends Serializable, Iterable<Column> {
   * @return             The size of the list
   */
   public int size();
+
+  /**
+  * Return all the names of the columns contained in the column list
+  * @return all the names of the columns contained in the column list
+  */
+  public List<String> names();
 }

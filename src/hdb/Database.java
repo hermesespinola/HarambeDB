@@ -43,6 +43,8 @@ import java.io.File;
 * If you have already created databases and you want to change this value make
 * sure to move all files in the old directory to the new directory.
 *
+* Make sure you call the save method everytime you are done working with the database.
+*
 * <p>This class is a member of the
 * <a href="{@docRoot}/index.html" target="_top">
 * HarambeDB database framework</a>.
@@ -62,12 +64,12 @@ public class Database implements Serializable {
   /**
   * An array of tables in the database
   */
-  public transient ArrayLinearList<Table<?>> tables;
+  protected transient ArrayLinearList<Table<?>> tables;
 
   /**
   * A dictionary that maps the name of the database to an index in the tables array
   */
-  public Dict<String, Integer> tableMap; // tableName -> table index in tables
+  protected Dict<String, Integer> tableMap; // tableName -> table index in tables
 
   /**
   * The graph containing the relations
@@ -98,9 +100,6 @@ public class Database implements Serializable {
   public Database(String dbName) throws HarambException {
     this.path = rootDir + dbName + '/';
     this.dbName = dbName;
-    tableMap = new LinkedDict<>();
-    tables = new ArrayLinearList<>();
-    relations = new AdjacencyList(0);
 
     File dbDir = new File(this.path);
     if (!dbDir.exists()) {
@@ -116,6 +115,21 @@ public class Database implements Serializable {
     } else {
       throw new HarambException("Database " + dbName + " already exists");
     }
+
+    tableMap = new LinkedDict<>();
+    tables = new ArrayLinearList<>();
+    relations = new AdjacencyList(0);
+
+    createSaveHook();
+  }
+
+  private void createSaveHook() {
+    Database self = this;
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      public void run() {
+        self.save();
+      }
+    });
   }
 
   /**
@@ -267,12 +281,13 @@ public class Database implements Serializable {
     try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(
       new FileInputStream(rootDir + dbName + '/' + dbName + extension)))) {
         Database db = (Database) ois.readObject();
+        // table map is not being loaded
         int size = db.tableMap.getSize();
-        // error here
-        db.tables = new ArrayLinearList<Table<?>>(size, size * 2);
+        db.tables = new ArrayLinearList<Table<?>>(size, size * 2 + 5);
         for (String tableName : db.tableMap.keys()) {
           db.tables.set(db.tableMap.getValue(tableName), Table.load(db.path, tableName));
         }
+        db.createSaveHook();
         return db;
     } catch (Exception e) {
       throw new HarambException(e);
@@ -283,7 +298,7 @@ public class Database implements Serializable {
   * Saves the database file
   * @throws HarambException If there is an error writing a file
   */
-  private void saveDbObject() throws HarambException {
+  public void saveDbObject() throws HarambException {
     try (ObjectOutputStream oos = new ObjectOutputStream(
       new FileOutputStream(this.path + this.dbName + extension))) {
       oos.writeObject(this);
@@ -293,7 +308,8 @@ public class Database implements Serializable {
   }
 
   /**
-  * Saves the database file and all the table files
+  * Saves the database file and all the table files, you should call this method
+  * every time you stop using the db, otherwise you'll lose the newly created data
   * @throws HarambException If there is an error writing a file
   */
   public void save() throws HarambException {

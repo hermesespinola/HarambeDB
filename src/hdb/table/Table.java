@@ -171,6 +171,9 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   }
 
   public void removeRow(PrimaryKey key) throws HarambException {
+    if (partitions.isEmpty()) {
+      throw new HarambException("Table " + tableName + " is empty");
+    }
     loadPartition(key);
     // if the smallest key is removed update the avl tree
     if (currentPartition.removeRow(key)) {
@@ -304,6 +307,9 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   */
   private final void loadPartition(PrimaryKey keyInRange) throws HarambException {
     KeyValueNode<PrimaryKey,Integer> partitionInfo = partitions.getClosest(keyInRange);
+    if (partitionInfo == null) {
+      throw new HarambException("Table " + tableName + " is empty");
+    }
     if (currentPartition == null) {
       currentPartition = Partition.load(this.path, partitionInfo.getValue());
     } else if (partitionInfo.getKey().compareTo(currentPartition.getKeys().get(0)) != 0) {

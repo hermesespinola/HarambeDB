@@ -1,23 +1,23 @@
-package database.table;
+package hdb.table;
 
-import database.table.relation.Relation;
+import hdb.table.relation.Relation;
 import structures.list.ArrayLinearList;
 import structures.node.KeyValueNode;
 import java.io.BufferedInputStream;
 import structures.dict.LinkedDict;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import database.HarambException;
+import hdb.HarambException;
 import java.io.FileOutputStream;
-import database.table.column.*;
+import hdb.table.column.*;
 import java.io.FileInputStream;
 import java.io.Serializable;
-import database.table.row.*;
+import hdb.table.row.*;
 import structures.dict.Dict;
 import structures.list.List;
 import java.util.ArrayList;
 import structures.tree.AVL;
-import database.Database;
+import hdb.Database;
 import java.util.Arrays;
 import java.io.File;
 

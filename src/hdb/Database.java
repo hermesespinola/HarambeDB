@@ -1,9 +1,9 @@
-package database;
+package hdb;
 
 import structures.graph.unweighted.directed.AdjacencyList;
-import database.table.relation.Relation;
+import hdb.table.relation.Relation;
 import structures.list.ArrayLinearList;
-import database.table.column.Column;
+import hdb.table.column.Column;
 import java.io.BufferedInputStream;
 import java.io.ObjectOutputStream;
 import structures.dict.LinkedDict;
@@ -11,10 +11,10 @@ import java.io.ObjectInputStream;
 import java.io.InputStreamReader;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
-import database.table.row.Row;
+import hdb.table.row.Row;
 import java.io.BufferedReader;
 import java.util.Collections;
-import database.table.Table;
+import hdb.table.Table;
 import java.io.Serializable;
 import structures.list.List;
 import structures.dict.Dict;
@@ -36,7 +36,7 @@ import java.io.File;
 * A directed unweighted adjacency list graph is used to store and look for
 * relations. The adjacency list graph is used instead of a matrix implementation
 * because a new node is added to the graph every time a new table is added to
-* the database.
+* the hdb.
 *
 * The rootDir static constant is used to keep track of HarambeDB files on your system,
 * You can change this to wherever you want to store your database files.

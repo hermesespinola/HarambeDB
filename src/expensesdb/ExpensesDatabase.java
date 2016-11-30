@@ -1,13 +1,13 @@
 package expensesdb;
 
-import database.table.relation.Relation;
-import database.table.column.Column;
-import database.HarambException;
-import database.table.row.Row;
-import database.table.Table;
+import hdb.table.relation.Relation;
+import hdb.table.column.Column;
+import hdb.HarambException;
+import hdb.table.row.Row;
+import hdb.table.Table;
 import java.util.Comparator;
 import structures.list.List;
-import database.Database;
+import hdb.Database;
 
 /**
 * This is an example of using the HarambeDB framework to write a static database

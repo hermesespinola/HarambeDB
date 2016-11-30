@@ -1,13 +1,13 @@
-package database.table.column;
+package hdb.table.column;
 
 import java.io.Serializable;
-import database.HarambException;
-import database.table.Table;
-import database.Database;
-import database.table.relation.Relation;
+import hdb.HarambException;
+import hdb.table.Table;
+import hdb.Database;
+import hdb.table.relation.Relation;
 
 /**
-* Represents a Column in the HarambeDB database.
+* Represents a Column in the HarambeDB hdb.
 *
 * This class is used along the row class to obtain a field in a row.
 * Usually you also need to define a ColumnList in order to create a row.

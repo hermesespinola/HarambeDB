@@ -1,10 +1,10 @@
-package database.table.column;
+package hdb.table.column;
 
 import structures.dict.LinkedDict;
 import java.io.Serializable;
 
 /**
-* Represents a list of colums to be stored in a Table in the HarambeDB database.
+* Represents a list of colums to be stored in a Table in the HarambeDB hdb.
 *
 * This class is used to represent the columns in a Table.
 * You can add new columns in the database even if you have already added row to

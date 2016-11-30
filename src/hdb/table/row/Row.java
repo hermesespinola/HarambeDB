@@ -1,13 +1,13 @@
-package database.table.row;
+package hdb.table.row;
 
-import database.table.column.ColumnList;
-import database.table.column.Column;
-import database.HarambException;
+import hdb.table.column.ColumnList;
+import hdb.table.column.Column;
+import hdb.HarambException;
 import java.io.Serializable;
 import java.util.List;
 
 /**
-* Interface of a Row in the HarambeDB database.
+* Interface of a Row in the HarambeDB hdb.
 *
 * <p>This class is a member of the
 * <a href="{@docRoot}/index.html" target="_top">

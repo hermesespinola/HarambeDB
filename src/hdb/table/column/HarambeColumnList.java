@@ -1,11 +1,11 @@
-package database.table.column;
+package hdb.table.column;
 
 import structures.dict.LinkedDict;
 import java.util.Iterator;
 import java.io.Serializable;
 
 /**
-* Main implementation of interface ColumnList for HarambeDB database. This class
+* Main implementation of interface ColumnList for HarambeDB hdb. This class
 * uses a LinkedDict to represent the list of columns.
 *.
 * <p>This class is a member of the

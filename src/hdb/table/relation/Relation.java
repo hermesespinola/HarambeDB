@@ -1,8 +1,8 @@
-package database.table.relation;
+package hdb.table.relation;
 
-import database.table.column.Column;
-import database.HarambException;
-import database.table.Table;
+import hdb.table.column.Column;
+import hdb.HarambException;
+import hdb.table.Table;
 import java.io.Serializable;
 
 /**

@@ -1,12 +1,12 @@
-package database.table;
+package hdb.table;
 
 import structures.list.DoublyLinkedList;
 import java.io.ObjectOutputStream;
 import structures.dict.LinkedDict;
 import java.io.ObjectInputStream;
-import database.HarambException;
+import hdb.HarambException;
 import java.io.FileOutputStream;
-import database.table.row.Row;
+import hdb.table.row.Row;
 import structures.list.List;
 import structures.dict.Dict;
 import java.io.Serializable;

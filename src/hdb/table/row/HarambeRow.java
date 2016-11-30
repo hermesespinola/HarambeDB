@@ -1,12 +1,12 @@
-package database.table.row;
+package hdb.table.row;
 
 import structures.list.ArrayLinearList;
-import database.HarambException;
-import database.table.column.*;
+import hdb.HarambException;
+import hdb.table.column.*;
 import java.util.Iterator;
 
 /**
-* Main implementation of interface Row for HarambeDB database.
+* Main implementation of interface Row for HarambeDB hdb.
 * This row implementation stores an array of objects to store the values of each
 * row, and the Column class stores the index of the array where its value is
 * stored.

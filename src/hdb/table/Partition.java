@@ -1,10 +1,10 @@
-package database.table;
+package hdb.table;
 
 import java.io.BufferedInputStream;
 import java.io.ObjectInputStream;
-import database.HarambException;
+import hdb.HarambException;
 import java.io.FileInputStream;
-import database.table.row.Row;
+import hdb.table.row.Row;
 import java.io.Serializable;
 import structures.dict.Dict;
 import structures.list.List;

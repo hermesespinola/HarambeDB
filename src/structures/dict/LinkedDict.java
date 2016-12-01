@@ -1,8 +1,10 @@
 package structures.dict;
-import java.util.Iterator;
+
 import structures.list.ArrayLinearList;
-import java.util.Iterator;
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Iterator;
+import java.util.Arrays;
 
 /**
 * An implementation of the Dictionary interface using an array of linked lists

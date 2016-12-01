@@ -392,7 +392,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   * @param  key  The key of the row to print
   * @param  The result of some method to obtain the relations of a row
   */
-  public void prettyPrint(PrimaryKey key, List<Row> relations) {
+  public void printRelation(PrimaryKey key, List<Row> relations) {
     StringBuilder cols = new StringBuilder();
     StringBuilder row = new StringBuilder();
 

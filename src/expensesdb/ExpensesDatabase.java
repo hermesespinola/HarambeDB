@@ -221,7 +221,7 @@ public final class ExpensesDatabase {
 	* @return						The similarity between the users
 	*	@throws HarambException		If there is some error reading or writing to the database
 	*/
-	public int userSimilarity(String xName, String yName) throws HarambException {
+	public static int userSimilarity(String xName, String yName) throws HarambException {
 		return Math.abs(getTotalPayments(xName) - getTotalPayments(yName));
 	}
 
@@ -231,7 +231,7 @@ public final class ExpensesDatabase {
 	* @return						The sum of all his/her expenses payments
 	*	@throws HarambException		If there is some error reading or writing to the database
 	*/
-	public int getTotalPayments(String userName) throws HarambException {
+	public static int getTotalPayments(String userName) throws HarambException {
 		List<Row> userInvoices = users.getRowWithRelation(userName, db);
 		int total = 0;
 		for (int i = 1; i < userInvoices.size(); i++) {
@@ -301,7 +301,19 @@ public final class ExpensesDatabase {
 		// addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
 		// addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
 
-		users.prettyPrint("Eros", getUserAndExpenses("Eros"));
-		// System.out.println(getUserAndExpenses("Hermes"));
+		users.printRelation("Eros", getUserAndExpenses("Eros"));
+		System.out.println();
+		users.printRelation("Mike", getUserAndExpenses("Mike"));
+		System.out.println();
+		users.printRelation("Hermes", getUserAndExpenses("Hermes"));
+		System.out.println();
+		invoices.printRelation(765, getInvoiceAndItems(765));
+		System.out.println();
+		System.out.println("Eros: " + getTotalPayments("Eros"));
+		System.out.println();
+		System.out.println("Hermes: " + getTotalPayments("Hermes"));
+		addInvoice("Eros", 456, new String[] {"Queso", "Mayonesa"});
+		users.printRelation("Eros", getUserAndExpenses("Eros"));
+
 	}
 }

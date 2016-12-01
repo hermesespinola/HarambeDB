@@ -389,8 +389,8 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
   /**
   * Prints a relation obtained from this table, (i.e. with relations=getRowWithRelation()).
-  * @param  key  The key of the row to print
-  * @param  The result of some method to obtain the relations of a row
+  * @param  key        The key of the row to print
+  * @param  relations  The result of some method to obtain the relations of a row
   */
   public void printRelation(PrimaryKey key, List<Row> relations) {
     StringBuilder cols = new StringBuilder();

@@ -1,1 +1,6 @@
 expensesdb
+hdb
+hdb.table
+hdb.table.column
+hdb.table.relation
+hdb.table.row

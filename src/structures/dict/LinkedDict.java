@@ -107,6 +107,7 @@ public class LinkedDict<Key, Val> implements Dict<Key, Val> {
         n--;
         return v;
       }
+      x = x.next;
     }
     return null;
   }

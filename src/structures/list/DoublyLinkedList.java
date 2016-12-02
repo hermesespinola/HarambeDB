@@ -79,8 +79,10 @@ public class DoublyLinkedList<T> implements List<T>, Serializable {
   public int indexOf(T x) {
     DoublyLinkedNode<T> currentNode = this.first;
     int i = 0;
-    while (currentNode != null && currentNode.getValue() != null) {
-      if (currentNode.getValue() == x) return i;
+    while (currentNode.getValue() != null) {
+      if (currentNode.getValue() == x) {
+        return i;
+      }
       currentNode = currentNode.next();
       i++;
     }

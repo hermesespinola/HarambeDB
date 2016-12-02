@@ -64,21 +64,4 @@ public class AdjacencyList implements UnweightedGraph<ALVertex> {
     }
     return sb.append('}').toString();
   }
-
-  public static void main(String[] args) {
-    UnweightedGraph<ALVertex> g = new AdjacencyList(10);
-    g.addEdge(1, 4);
-    g.addEdge(1, 6);
-    g.addEdge(4, 6);
-    g.addEdge(0, 9);
-    g.addEdge(4, 9);
-    g.addEdge(8, 3);
-    g.addEdge(7, 2);
-    g.addEdge(6, 5);
-    System.out.println(g);
-    Graph.BFS(g, 4);
-    System.out.println(g);
-    Graph.DFS(g, 4);
-    System.out.println(g);
-  }
 }

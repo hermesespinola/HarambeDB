@@ -127,13 +127,14 @@ public final class ExpensesDatabase {
 	public static void deleteUser(String userName, boolean removeInvoices) throws HarambException {
 		if (removeInvoices) {
 			Integer[] uids = users.getRow(userName).get(users.getColumn("Invoices"));
-			System.out.println(Arrays.toString(uids));
-			for (Integer invoiceId : uids) {
-				System.out.println(invoiceId);
-				invoices.removeRow(invoiceId);
-			}
+			if (uids != null)
+				for (Integer invoiceId : uids) {
+					invoices.removeRow(invoiceId);
+				}
 		}
+		System.out.println("startRemoveRowUser");
 		users.removeRow(userName);
+		System.out.println("removeRowUser");
 	}
 
 	/**
@@ -278,8 +279,6 @@ public final class ExpensesDatabase {
 	* main method for testing purposes
 	*/
 	public static void main(String[] args) throws HarambException {
-		// deleteUser("Hermes", false); // should return an exception
-
 		addUser("Hermes", "Aqui");
 		addUser("Mike", "Allá");
 		addUser("Eros", "Aquí también");
@@ -292,33 +291,11 @@ public final class ExpensesDatabase {
 		addItem("Queso", 5);
 		addItem("Mayonesa", 28);
 
-		// Row eros = getUser("Eros");
-		// System.out.println((String)eros.get(users.getColumn("Address")));
-		// Integer[] erosInv = eros.get(users.getColumn("Invoices"));
-		// System.out.println(Arrays.toString(erosInv));
-		// System.out.println(getItem("Huevos"));
+		addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
+		addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
+		addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
+		addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
 
-		// addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
-		// addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
-		// addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
-		// addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
-
-		// users.printRelation("Mike", getUserAndExpenses("Mike"));
-		// deleteUser("Mike", true);
-
-		// users.printRelation("Eros", getUserAndExpenses("Eros"));
-		// System.out.println();
-		// users.printRelation("Mike", getUserAndExpenses("Mike"));
-		// System.out.println();
-		// users.printRelation("Hermes", getUserAndExpenses("Hermes"));
-		// System.out.println();
-		// invoices.printRelation(765, getInvoiceAndItems(765));
-		// System.out.println();
-		// System.out.println("Eros: " + getTotalPayments("Eros"));
-		// System.out.println();
-		// System.out.println("Hermes: " + getTotalPayments("Hermes"));
-		// users.printRelation("Eros", getUserAndExpenses("Eros"));
-		// users.printRelation("Mike", getUserAndExpenses("Mike"));
-		// deleteUser("Mike", true);
+		deleteUser("Mike", true);
 	}
 }

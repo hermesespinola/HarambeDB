@@ -357,6 +357,11 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     return this.pkName;
   }
 
+  /**
+  * Adds blank spaces to the end of a string builder
+  * @param  sb      The string builder
+  * @param  amount  The amount of blank spaces to add
+  */
   private void appendBlankSpaces(StringBuilder sb, int amount) {
     for (int i = 0; i < amount; i++) {
       sb.append(' ');

@@ -72,7 +72,6 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     }
   }
 
-
   public String path() {
     return this.path;
   }
@@ -133,7 +132,6 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
     return sortedKeys;
   }
 
-
   public int partitionNumber() {
     return this.partitionNumber;
   }
@@ -151,9 +149,12 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
 
   public boolean removeRow(PrimaryKey key) throws HarambException {
     rows.remove(key);
+
+    // FIXME: Something weird happening here
+    System.out.println("removed row");
     PrimaryKey firstKey = sortedKeys.get(0);
     PrimaryKey removedKey = sortedKeys.remove(sortedKeys.indexOf(key));
-    if (key == null) {
+    if (removedKey == null) {
       throw new HarambException("No such key");
     }
     return firstKey == removedKey;

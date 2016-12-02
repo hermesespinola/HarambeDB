@@ -80,7 +80,7 @@ public class DoublyLinkedList<T> implements List<T>, Serializable {
     DoublyLinkedNode<T> currentNode = this.first;
     int i = 0;
     while (currentNode.getValue() != null) {
-      if (currentNode.getValue() == x) {
+      if (currentNode.getValue().equals(x)) {
         return i;
       }
       currentNode = currentNode.next();

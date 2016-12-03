@@ -320,7 +320,10 @@ public final class ExpensesDatabase {
 	}
 
 	/**
-	*	Get the total earnings after expenses, i.e. the sum of all invoice payments
+	*	Compute the total earnings after expenses, i.e. the sum of all invoice payments.
+	* This is an expensive operation and you should save this value instead of calling
+	* this function again and again
+	* @return the earnings after expenses
 	*/
 	public static int getEarnings() {
 		Column paymentCol = invoices.getColumn("Payment");

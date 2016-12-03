@@ -10,4 +10,4 @@ Enter the git folder and excecute this:
 javac -d bin -sourcepath src -cp . $(find . | grep .java);
 ```
 
-The .class files should be written in the bin folder.
+The .class files should be generated in the bin folder.

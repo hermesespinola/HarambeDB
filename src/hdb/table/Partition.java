@@ -38,7 +38,7 @@ import java.io.IOException;
 * @see     Table
 * @see     Row
 */
-public interface Partition<PrimaryKey extends Comparable<? super PrimaryKey>> {
+interface Partition<PrimaryKey extends Comparable<? super PrimaryKey>> {
 
   /**
   * The extension of the partition files

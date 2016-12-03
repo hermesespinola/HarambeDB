@@ -50,7 +50,7 @@ import hdb.Database;
 * @see     Column
 * @see     Row
 */
-public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable, Iterable<Row> {
+public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable, Iterable<PrimaryKey> {
   /**
   * avl tree containing the ID and minimum value of the diferent partitions of the table
   */
@@ -256,6 +256,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
           // it is guaranteed that every field in the related column holds an array.
           Table<OtherPrimaryKey> related = col.getRelatedTable(db);
           OtherPrimaryKey[] keys = rows.get(0).get(col);
+          if (keys == null) continue;
           ArrayLinearList<OtherPrimaryKey> nonexistentEndpoints = new ArrayLinearList<>();
           for (OtherPrimaryKey r : keys)
             try {
@@ -452,6 +453,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
 
     for (int i = 0; i < columns.size(); i++) {
       Object field = relations.get(0).get(columns.get(colNames.get(i)));
+      if (field == null) continue;
       String fieldString = (field.getClass().isArray()) ? Arrays.toString((Object[])field) : field.toString();
       center(cols, row, colNames.get(i), fieldString);
     }
@@ -498,18 +500,33 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     }
   }
 
-  public Iterator<Row> iterator() {
+  public Iterator<PrimaryKey> iterator() {
     return new TableIterator();
   }
 
-  // TODO: write the table Iterator
-  public class TableIterator implements Iterator<Row> {
-    public Row next() {
+  /**
+  * A class to iterate over all primary keys of a table.
+  */
+  public class TableIterator implements Iterator<PrimaryKey> {
+    Iterator<Integer> pIter;
+    Partition<PrimaryKey> p;
+    Iterator<PrimaryKey> keysIter;
 
+    {
+      pIter = partitions.iterator();
+      p = (pIter.hasNext()) ? Partition.load(path, pIter.next()) : null;
+      keysIter = (p != null) ? p.getKeys().iterator() : null;
+    }
+
+    public PrimaryKey next() {
+      if (!keysIter.hasNext() && pIter.hasNext()) {
+        keysIter = p.getKeys().iterator();
+      }
+      return keysIter.next();
     }
 
     public boolean hasNext() {
-
+      return pIter.hasNext() || keysIter.hasNext();
     }
   }
 }

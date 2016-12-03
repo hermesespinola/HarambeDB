@@ -29,7 +29,7 @@ import java.io.IOException;
 * @see     Table
 * @see     Row
 */
-public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>> implements Partition<PrimaryKey>, Serializable {
+class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>> implements Partition<PrimaryKey>, Serializable {
 
   /**
   * The partition ID

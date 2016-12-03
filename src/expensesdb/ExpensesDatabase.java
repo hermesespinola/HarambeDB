@@ -320,6 +320,19 @@ public final class ExpensesDatabase {
 	}
 
 	/**
+	*	Get the total earnings after expenses, i.e. the sum of all invoice payments
+	*/
+	public static int getEarnings() {
+		Column paymentCol = invoices.getColumn("Payment");
+		int total = 0;
+		for (Integer invoice : invoices) {
+			Integer payment = invoices.getRow(invoice).get(paymentCol);
+			total += payment;
+		}
+		return total;
+	}
+
+	/**
 	* main method for testing purposes
 	*/
 	public static void main(String[] args) throws HarambException {
@@ -350,6 +363,6 @@ public final class ExpensesDatabase {
 		// deleteInvoice(235);
 		// users.printRelation("Eros", getUserAndExpenses("Eros"));
 		// updateUserInvoices("Eros");
-		users.printRelation("Eros", getUserAndExpenses("Eros"));
+		System.out.println(getEarnings());
 	}
 }

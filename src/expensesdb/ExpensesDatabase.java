@@ -1,5 +1,6 @@
 package expensesdb;
 
+import structures.list.ArrayLinearList;
 import hdb.table.relation.Relation;
 import hdb.table.column.Column;
 import hdb.HarambException;
@@ -132,9 +133,7 @@ public final class ExpensesDatabase {
 					invoices.removeRow(invoiceId);
 				}
 		}
-		System.out.println("startRemoveRowUser");
 		users.removeRow(userName);
-		System.out.println("removeRowUser");
 	}
 
 	/**
@@ -202,9 +201,54 @@ public final class ExpensesDatabase {
 	*	@throws HarambException		If there is some error reading or writing to the database
 	*/
 	public static List<Row> getInvoiceAndItems(Integer invoiceUID) throws HarambException {
-		return invoices.getRowWithRelations(invoiceUID, db);
+		return invoices.getRowWithRelation(invoiceUID, db);
 	}
 
+	/**
+	* Updates the final paymen of an invoice (i.e: if an item has been deleted you
+	*	should call this method)
+	* @param	invoiceUID	The invoice number
+	*/
+	public static void updateInvoicePayment(Integer invoiceUID) {
+		List<Row> relation = invoices.getRowWithRelation(invoiceUID, db);
+		Row invoice = relation.get(0);
+		Column itemsCol = invoices.getColumn("Items");
+		Column expenseCol = items.getColumn("Expense");
+		String[] itemsNames = invoice.get(itemsCol);
+		ArrayLinearList<String> remainingItems = new ArrayLinearList<>();
+
+		int newTotal = 0;
+		for (String itemName : itemsNames) {
+			if (itemName != null) {
+				remainingItems.add(itemName);
+				Integer itemExpense = items.getRow(itemName).get(expenseCol);
+				newTotal += itemExpense;
+			}
+		}
+		String[] newItemsNames = new String[remainingItems.size()];
+		remainingItems.copyToArray(newItemsNames);
+		invoice.set(invoices.getColumn("Payment"), newTotal).set(itemsCol, newItemsNames);
+	}
+
+	/**
+	* Updates the invoice list of a user if one or more invoices have been deleted
+	* @param	userName	The name of the user
+	*/
+	public static void updateUserInvoices(String userName) {
+		Row user = users.getRow(userName);
+		Column invoicesCol = users.getColumn("Invoices");
+		Integer[] userInvoices = user.get(invoicesCol);
+		ArrayLinearList<Integer> remainingInvoices = new ArrayLinearList<>();
+
+		for (Integer invoice : userInvoices) {
+			if (invoice != null) {
+				remainingInvoices.add(invoice);
+			}
+		}
+		Integer[] newInvoices = new Integer[remainingInvoices.size()];
+		remainingInvoices.copyToArray(newInvoices);
+		user.set(invoicesCol, newInvoices);
+	}
 
 	/**
 	* Retrieves the item row with the given name
@@ -279,23 +323,33 @@ public final class ExpensesDatabase {
 	* main method for testing purposes
 	*/
 	public static void main(String[] args) throws HarambException {
-		addUser("Hermes", "Aqui");
-		addUser("Mike", "Allá");
-		addUser("Eros", "Aquí también");
-		addUser("Santiago", "Vallarta");
-		addUser("Martina", "Tepic");
-
-		addItem("Huevos", 30);
-		addItem("Pan", 20);
-		addItem("Jamon", 15);
-		addItem("Queso", 5);
-		addItem("Mayonesa", 28);
-
-		addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
-		addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
-		addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
-		addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
-
-		deleteUser("Mike", true);
+		// uncomment if there is no database yet.
+		// addUser("Hermes", "Aqui");
+		// addUser("Mike", "Allá");
+		// addUser("Eros", "Aquí también");
+		// addUser("Santiago", "Vallarta");
+		// addUser("Martina", "Tepic");
+		//
+		// addItem("Huevos", 30);
+		// addItem("Pan", 20);
+		// addItem("Jamon", 15);
+		// addItem("Queso", 5);
+		// addItem("Mayonesa", 28);
+		//
+		// addInvoice("Hermes", 123, new String[] {"Pan", "Queso", "Mayonesa", "Jamon"});
+		// addInvoice("Eros", 234, new String[] {"Jamon", "Huevos"});
+		// addInvoice("Mike", 765, new String[] {"Mayonesa", "Huevos"});
+		// addInvoice("Eros", 235, new String[] {"Pan", "Queso"});
+		//
+		// users.printRelation("Eros", getUserAndExpenses("Eros"));
+		// deleteItem("Queso");
+		// updateInvoicePayment(235);
+		// System.out.println();
+		// users.printRelation("Eros", getUserAndExpenses("Eros"));
+		// System.out.println();
+		// deleteInvoice(235);
+		// users.printRelation("Eros", getUserAndExpenses("Eros"));
+		// updateUserInvoices("Eros");
+		users.printRelation("Eros", getUserAndExpenses("Eros"));
 	}
 }

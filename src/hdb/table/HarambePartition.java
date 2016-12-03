@@ -150,8 +150,6 @@ public class HarambePartition<PrimaryKey extends Comparable<? super PrimaryKey>>
   public boolean removeRow(PrimaryKey key) throws HarambException {
     rows.remove(key);
 
-    // FIXME: Something weird happening here
-    System.out.println("removed row");
     PrimaryKey firstKey = sortedKeys.get(0);
     PrimaryKey removedKey = sortedKeys.remove(sortedKeys.indexOf(key));
     if (removedKey == null) {

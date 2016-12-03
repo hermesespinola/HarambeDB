@@ -62,7 +62,7 @@ public int indexOf(T x) {
 }
 
 public void set(int index, T newE) {
-  if (index < 0 || index >= this.size) throw new IndexOutOfBoundsException();
+  if (index < 0 || index >= this.size) throw new IndexOutOfBoundsException(Integer.toString(index));
   this.arr[index] = newE;
 }
 
@@ -130,10 +130,8 @@ public ListIterator<T> iterator(int index) {
         return new IteratorArray(index);
 }
 
-public T[] toArray() {
-  T[] r = (T[]) new Object[size];
-  System.arraycopy(r, 0, this.arr, 0, r.length);
-  return r;
+public void copyToArray(T[] target) {
+  System.arraycopy(this.arr, 0, target, 0, size);
 }
 
 public static void main(String[] args) {

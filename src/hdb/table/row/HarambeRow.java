@@ -44,7 +44,7 @@ public class HarambeRow implements Row {
   }
 
   public <T> HarambeRow set(Column col, T element) throws HarambException {
-    while (col.index() > row.size()) {
+    while (col.index() >= row.size()) {
       row.add(null);
     }
 
@@ -52,7 +52,7 @@ public class HarambeRow implements Row {
       throw new HarambException("Element's type of '" + element + "' does not agree with column data type:" + col.type());
     }
 
-    row.add(col.index(), element);
+    row.set(col.index(), element);
 
     return this;
   }

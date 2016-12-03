@@ -53,7 +53,9 @@ public class AdjacencyList implements UnweightedGraph<ALVertex> {
   }
 
   public ALVertex[] getGraph() {
-    return this.matrix.toArray();
+    ALVertex[] vertices = new ALVertex[this.matrix.size()];
+    this.matrix.copyToArray(vertices);
+    return vertices;
   }
 
   public String toString() {

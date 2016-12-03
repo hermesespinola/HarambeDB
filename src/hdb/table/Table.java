@@ -1,25 +1,27 @@
 package hdb.table;
 
-import hdb.table.relation.Relation;
 import structures.list.ArrayLinearList;
 import structures.node.KeyValueNode;
+import hdb.table.relation.Relation;
 import java.io.BufferedInputStream;
 import structures.dict.LinkedDict;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import hdb.HarambException;
 import java.io.FileOutputStream;
-import hdb.table.column.*;
+import java.lang.reflect.Array;
 import java.io.FileInputStream;
 import java.io.Serializable;
-import hdb.table.row.*;
 import structures.dict.Dict;
 import structures.list.List;
 import structures.tree.AVL;
+import hdb.HarambException;
 import java.util.ArrayList;
-import hdb.Database;
+import hdb.table.column.*;
+import java.util.Iterator;
 import java.util.Arrays;
+import hdb.table.row.*;
 import java.io.File;
+import hdb.Database;
 
 /**
 * This Table Class, along with Partition are the Backbone of HarambeDB, it
@@ -48,7 +50,7 @@ import java.io.File;
 * @see     Column
 * @see     Row
 */
-public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable {
+public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements Serializable, Iterable<Row> {
   /**
   * avl tree containing the ID and minimum value of the diferent partitions of the table
   */
@@ -229,28 +231,54 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   * if the related table of one row has a column with another relation then the
   * row of that relation is retrieved as well)
   * @param  key               The value of the primary key of the row
+  * @param  Class             The class of the other primary key
   * @param  db                The database the related tables are located
   * @param  <OtherPrimaryKey> The data type of the primary key of the other table
   * @throws HarambException   If there is an error reading table or partition files
   * @return                   A list of rows containing the row of this table at position 0 and related rows from 1 up to n, where n is the size of the list.
   */
+  @SuppressWarnings("unchecked")
   public <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> ArrayLinearList<Row> getRowWithRelation(PrimaryKey key, Database db) throws HarambException {
-    loadPartition(key);
     ArrayLinearList<Row> rows = new ArrayLinearList<>(5);
     rows.add(getRow(key));
     for (Column col : columns) {
-      if (col.hasRelation()) {
-        if (col.relationType() == Relation.Type.oneToOne) {
-          rows.add(col.getRelatedTable(db).getRow(rows.get(0).get(col)));
-        } else {
+      if (col.hasRelation())
+        if (col.relationType() == Relation.Type.oneToOne)
+          try {
+            if (rows.get(0).get(col) != null)
+              rows.add(col.getRelatedTable(db).getRow(rows.get(0).get(col)));
+          } catch (HarambException he) {
+            // If the endpoind of the relation does not exist, either it has been
+            // erased or it never existed, anyway, set the field of the column to null
+            rows.set(0, getRow(key).set(col, null));
+          }
+        else {
           // it is guaranteed that every field in the related column holds an array.
           Table<OtherPrimaryKey> related = col.getRelatedTable(db);
           OtherPrimaryKey[] keys = rows.get(0).get(col);
-          for (OtherPrimaryKey r : keys) {
-            rows.add(related.getRow(r));
+          ArrayLinearList<OtherPrimaryKey> nonexistentEndpoints = new ArrayLinearList<>();
+          for (OtherPrimaryKey r : keys)
+            try {
+              if (r != null) {
+                rows.add(related.getRow(r));
+              }
+            } catch (HarambException he) {
+              // If the endpoind of the relation does not exist, either it has been
+              // erased or it never existed, keep track of these values to remove
+              // them afterwards
+              nonexistentEndpoints.add(r);
+            }
+
+          // If there were nonexistentEndpoints then remove the bad keys >:c
+          if (!nonexistentEndpoints.empty()) {
+            int i = 0;
+            for (OtherPrimaryKey k : keys) {
+              if (nonexistentEndpoints.indexOf(k) != -1)
+                keys[i] = null;
+              i++;
+            }
           }
         }
-      }
     }
     return rows;
   }
@@ -265,18 +293,35 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
   * @throws HarambException   If there is an error reading table or partition files
   */
   private <OtherPrimaryKey extends Comparable<? super OtherPrimaryKey>> void getRowWithRelationsUtil(PrimaryKey key, Database db, ArrayLinearList<Row> target) throws HarambException {
-    loadPartition(key);
     int idx = target.size();  // index of the row of the current table
     target.add(getRow(key));
     for (Column col : columns) {
       if (col.hasRelation()) {
         if (col.relationType() == Relation.Type.oneToOne) {
-          col.getRelatedTable(db).getRowWithRelationsUtil(target.get(idx).get(col), db, target);
+          try {
+            col.getRelatedTable(db).getRowWithRelationsUtil(target.get(idx).get(col), db, target);
+          } catch (HarambException he) {
+            target.add(getRow(key).set(col, null));
+          }
         } else {
           Table<OtherPrimaryKey> related = col.getRelatedTable(db);
           OtherPrimaryKey[] keys = target.get(idx).get(col);
+          ArrayLinearList<OtherPrimaryKey> nonexistentEndpoints = new ArrayLinearList<>();
           for (OtherPrimaryKey r : keys) {
-            related.getRowWithRelationsUtil(r, db, target);
+            try {
+              related.getRowWithRelationsUtil(r, db, target);
+            } catch (HarambException he) {
+              nonexistentEndpoints.add(r);
+            }
+          }
+          // If there were nonexistentEndpoints then remove the bad keys >:c
+          if (!nonexistentEndpoints.empty()) {
+            int i = 0;
+            for (OtherPrimaryKey k : keys) {
+              if (nonexistentEndpoints.indexOf(k) != -1)
+                keys[i] = null;
+              i++;
+            }
           }
         }
       }
@@ -426,7 +471,7 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
     for (int i = 1; i < relations.size(); i++) {
       Row r = relations.get(i);
       if (previousRowSize != r.size()) {
-        if (relations.get(i - 1).size() == relations.get(i + 1).size()) {
+        if (relations.get(i + 1) != null && relations.get(i - 1).size() == relations.get(i + 1).size()) {
           System.out.println(separator);
           depth--;
         } else {
@@ -450,6 +495,21 @@ public class Table<PrimaryKey extends Comparable<? super PrimaryKey>> implements
         return table;
     } catch (Exception e) {
       throw new HarambException(e);
+    }
+  }
+
+  public Iterator<Row> iterator() {
+    return new TableIterator();
+  }
+
+  // TODO: write the table Iterator
+  public class TableIterator implements Iterator<Row> {
+    public Row next() {
+
+    }
+
+    public boolean hasNext() {
+
     }
   }
 }

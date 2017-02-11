@@ -11,3 +11,6 @@ javac -d bin -sourcepath src -cp . $(find . | grep .java);
 ```
 
 The .class files should be generated in the bin folder.
+
+*for more information about how to use HarambeDB please go to the [HarambeDB documentation](https://hermesespinola.github.io/HarambeDB/)*
+

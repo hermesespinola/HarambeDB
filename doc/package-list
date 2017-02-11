@@ -1,1 +1,17 @@
 expensesdb
+hdb
+hdb.table
+hdb.table.column
+hdb.table.relation
+hdb.table.row
+structures.dict
+structures.graph
+structures.graph.unweighted
+structures.graph.unweighted.directed
+structures.heap
+structures.list
+structures.matrix
+structures.node
+structures.queue
+structures.stack
+structures.tree
